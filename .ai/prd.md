@@ -38,7 +38,7 @@ User goals
 
 FR-1 AI flashcard generation
 - Input: English-only pasted text in a textarea.
-- Limits: maximum input length 10,000 characters per request; requests producing at most 20 proposed cards per generation.
+- Limits: maximum input length 10,000 characters per request; requests producing at most 5 proposed cards per generation.
 - Output schema: strict JSON array of objects { front: string, back: string }.
 - Length caps: front ≤ 200 characters; back ≤ 500 characters.
 - Server-side: validate JSON schema and character limits; gracefully handle invalid model output.
