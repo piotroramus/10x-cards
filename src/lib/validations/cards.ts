@@ -35,4 +35,3 @@ export const createCardSchema = z.object({
  * Type inferred from createCardSchema for use in service layer
  */
 export type CreateCardValidation = z.infer<typeof createCardSchema>;
-
