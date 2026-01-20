@@ -1,0 +1,15 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import AuthLayout from "../../../components/auth/AuthLayout.astro";
+import { ResetPasswordConfirmView } from "../../../components/auth/ResetPasswordConfirmView";
+
+// Note: Supabase handles password reset tokens via URL hash fragments (#access_token=...)
+// The Supabase client SDK automatically detects and processes these tokens
+// We don't need to validate token/type here - the client-side form will handle it
+---
+
+<Layout title="Reset password">
+  <AuthLayout>
+    <ResetPasswordConfirmView client:load token={token} />
+  </AuthLayout>
+</Layout>

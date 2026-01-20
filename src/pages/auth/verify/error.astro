@@ -1,0 +1,42 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import AuthLayout from "../../../components/auth/AuthLayout.astro";
+import { ResendVerificationView } from "../../../components/auth/ResendVerificationView";
+import { AlertCircle } from "lucide-react";
+
+// Extract query parameters
+const email = Astro.url.searchParams.get("email") || "";
+---
+
+<Layout title="Verification error">
+  <AuthLayout>
+    <div class="w-full max-w-md space-y-6">
+      <div class="flex flex-col items-center space-y-4 text-center">
+        <div class="rounded-full bg-destructive/10 p-3">
+          <AlertCircle class="size-8 text-destructive" />
+        </div>
+        <div>
+          <h1 class="text-2xl font-semibold">Verification link invalid</h1>
+          <p class="mt-2 text-sm text-muted-foreground">
+            This verification link has expired or is invalid. Please request a new one.
+          </p>
+        </div>
+      </div>
+
+      {email && (
+        <div class="space-y-4">
+          <ResendVerificationView client:load email={email} />
+        </div>
+      )}
+
+      <div class="text-center">
+        <a
+          href="/auth/sign-in"
+          class="text-sm text-primary hover:underline"
+        >
+          Back to sign in
+        </a>
+      </div>
+    </div>
+  </AuthLayout>
+</Layout>

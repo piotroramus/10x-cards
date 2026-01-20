@@ -65,8 +65,7 @@ export async function generateProposals(
     "Content-Type": "application/json",
   };
   
-  // Only add Authorization header if token is provided
-  // When DISABLE_AUTH=true, token will be null and backend handles it
+  // Add Authorization header if token is provided
   if (token) {
     headers.Authorization = token;
   }

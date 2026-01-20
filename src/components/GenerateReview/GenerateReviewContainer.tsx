@@ -67,10 +67,7 @@ export function GenerateReviewContainer() {
     }
 
     const token = getToken();
-    // Token can be null in dev mode (DISABLE_AUTH), which is handled by backend
-    // If authenticated but no token, it means we're in dev mode - allow it
-    // Only show error if not authenticated and no token
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !token) {
       toast.error("Authentication required. Please sign in.");
       return;
     }

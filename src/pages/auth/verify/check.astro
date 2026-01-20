@@ -1,0 +1,46 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import AuthLayout from "../../../components/auth/AuthLayout.astro";
+import { ResendVerificationView } from "../../../components/auth/ResendVerificationView";
+
+// Extract query parameters
+const email = Astro.url.searchParams.get("email") || "";
+const returnUrl = Astro.url.searchParams.get("returnUrl") || undefined;
+
+if (!email) {
+  // Redirect to sign-up if no email provided
+  return Astro.redirect("/auth/sign-up");
+}
+---
+
+<Layout title="Verify your email">
+  <AuthLayout>
+    <div class="w-full max-w-md space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold">Check your email</h1>
+        <p class="mt-2 text-sm text-muted-foreground">
+          We've sent a verification link to <strong>{email}</strong>
+        </p>
+      </div>
+
+      <div class="rounded-md border bg-card p-4">
+        <p class="text-sm text-muted-foreground">
+          Click the link in the email to verify your account. If you don't see the email, check your spam folder.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <ResendVerificationView client:load email={email} />
+        
+        <div class="text-center">
+          <a
+            href={`/auth/sign-in${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ""}`}
+            class="text-sm text-primary hover:underline"
+          >
+            Back to sign in
+          </a>
+        </div>
+      </div>
+    </div>
+  </AuthLayout>
+</Layout>

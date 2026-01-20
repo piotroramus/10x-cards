@@ -18,7 +18,6 @@ export async function GET(context: APIContext): Promise<Response> {
       : "NOT SET",
     SUPABASE_URL: import.meta.env.SUPABASE_URL ? "SET" : "NOT SET",
     SUPABASE_KEY: import.meta.env.SUPABASE_KEY ? "SET" : "NOT SET",
-    DISABLE_AUTH: import.meta.env.DISABLE_AUTH || "false",
   };
 
   return new Response(JSON.stringify(envCheck, null, 2), {

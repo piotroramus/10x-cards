@@ -1,0 +1,19 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import AuthLayout from "../../components/auth/AuthLayout.astro";
+import { SignUpView } from "../../components/auth/SignUpView";
+
+// Extract query parameters
+const returnUrl = Astro.url.searchParams.get("returnUrl") || undefined;
+
+// Server-side auth check: If user is already authenticated, redirect to home
+if (Astro.locals.isAuthenticated && Astro.locals.user) {
+  return Astro.redirect(returnUrl || "/");
+}
+---
+
+<Layout title="Sign up">
+  <AuthLayout>
+    <SignUpView client:load returnUrl={returnUrl} />
+  </AuthLayout>
+</Layout>

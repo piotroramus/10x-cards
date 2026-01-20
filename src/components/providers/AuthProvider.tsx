@@ -1,19 +1,43 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 import type { User, Session } from "@supabase/supabase-js";
 import type { Database } from "@/db/database.types";
 
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
+// Use PUBLIC_ prefixed env vars for client-side access
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY || import.meta.env.SUPABASE_KEY;
 
-// Create Supabase client for client-side auth
-const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+// Validate environment variables
+if (typeof window !== "undefined") {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error(
+      "❌ Supabase environment variables are missing!",
+      "\nPlease add to your .env file:",
+      "\n  PUBLIC_SUPABASE_URL=your_supabase_url",
+      "\n  PUBLIC_SUPABASE_KEY=your_supabase_anon_key",
+      "\n\nCurrent values:",
+      "\n  PUBLIC_SUPABASE_URL:", import.meta.env.PUBLIC_SUPABASE_URL || "NOT SET",
+      "\n  PUBLIC_SUPABASE_KEY:", import.meta.env.PUBLIC_SUPABASE_KEY ? "SET (hidden)" : "NOT SET",
+      "\n  SUPABASE_URL:", import.meta.env.SUPABASE_URL || "NOT SET",
+      "\n  SUPABASE_KEY:", import.meta.env.SUPABASE_KEY ? "SET (hidden)" : "NOT SET",
+    );
+  }
+}
+
+// Create Supabase browser client using @supabase/ssr for cookie sync
+// Only create if we have the required values and we're in the browser
+let supabase: ReturnType<typeof createBrowserClient<Database>>;
+
+if (typeof window !== "undefined" && supabaseUrl && supabaseAnonKey) {
+  supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+} else if (typeof window !== "undefined") {
+  // Create a dummy client to prevent crashes, but auth methods will fail
+  console.warn("⚠️ Creating dummy Supabase client - auth will not work until env vars are set");
+  supabase = createBrowserClient<Database>("https://placeholder.supabase.co", "placeholder-key");
+} else {
+  // SSR: Create a placeholder (won't be used)
+  supabase = null as any;
+}
 
 interface AuthContextValue {
   user: User | null;
@@ -21,9 +45,14 @@ interface AuthContextValue {
   loading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    options?: { emailRedirectTo?: string },
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: Error | null }>;
   getToken: () => string | null;
+  resendVerificationEmail: (email: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -35,54 +64,14 @@ interface AuthProviderProps {
 /**
  * AuthProvider manages Supabase authentication state client-side
  * Handles token refresh automatically and provides auth methods
- * 
- * In development mode with DISABLE_AUTH, provides mock authenticated state
  */
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if auth is disabled (for development/testing)
-  // Note: Client-side can only access PUBLIC_ prefixed env vars
-  // Check PUBLIC_DISABLE_AUTH or if we're in development
-  // We'll check localhost inside useEffect since window isn't available during SSR
-  const disableAuth = import.meta.env.PUBLIC_DISABLE_AUTH === "true" || 
-                      (typeof import.meta.env.DEV !== "undefined" && import.meta.env.DEV);
-
   useEffect(() => {
-    // Re-check disableAuth inside useEffect to ensure it's evaluated correctly
-    // Also check if we're on localhost (client-side only check)
-    const isDevMode = import.meta.env.PUBLIC_DISABLE_AUTH === "true" || 
-                      (typeof import.meta.env.DEV !== "undefined" && import.meta.env.DEV) ||
-                      (typeof window !== "undefined" && 
-                       (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"));
-    
-    if (isDevMode) {
-      // Development mode: provide mock authenticated state
-      console.warn("⚠️  AUTHENTICATION DISABLED - Development mode only!");
-      const mockUser = {
-        id: import.meta.env.PUBLIC_MOCK_USER_ID || "00000000-0000-0000-0000-000000000000",
-        email: "dev@example.com",
-        // Add minimal required User properties
-      } as User;
-
-      const mockSession = {
-        access_token: "mock-token",
-        refresh_token: "mock-refresh",
-        expires_in: 3600,
-        expires_at: Date.now() / 1000 + 3600,
-        token_type: "bearer",
-        user: mockUser,
-      } as Session;
-
-      setUser(mockUser);
-      setSession(mockSession);
-      setLoading(false);
-      return;
-    }
-
-    // Normal auth flow: Get initial session
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -101,25 +90,42 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [disableAuth]);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) {
+      return { error: new Error("Supabase client not initialized") };
+    }
+    
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      return { error: error ? new Error(error.message) : null };
+      
+      if (error) {
+        return { error: new Error(error.message) };
+      }
+      
+      // Session is automatically stored in cookies by createBrowserClient
+      return { error: null };
     } catch (error) {
       return { error: error instanceof Error ? error : new Error(String(error)) };
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    options?: { emailRedirectTo?: string },
+  ) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: options?.emailRedirectTo,
+        },
       });
       return { error: error ? new Error(error.message) : null };
     } catch (error) {
@@ -137,12 +143,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const getToken = () => {
-    if (disableAuth) {
-      // In dev mode, return null (API client will omit Authorization header)
-      // Backend will handle DISABLE_AUTH mode
-      return null;
-    }
     return session?.access_token ? `Bearer ${session.access_token}` : null;
+  };
+
+  const resendVerificationEmail = async (email: string) => {
+    if (!supabase) {
+      return { error: new Error("Supabase client not initialized") };
+    }
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+      });
+      return { error: error ? new Error(error.message) : null };
+    } catch (error) {
+      return { error: error instanceof Error ? error : new Error(String(error)) };
+    }
   };
 
   const value: AuthContextValue = {
@@ -154,6 +171,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signOut,
     getToken,
+    resendVerificationEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
