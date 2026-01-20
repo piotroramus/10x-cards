@@ -246,3 +246,34 @@ export interface ErrorResponse {
     details?: Record<string, unknown>;
   };
 }
+
+// ============================================================================
+// View Model Types (for frontend state management)
+// ============================================================================
+
+/**
+ * Pending proposal view model - extends CardProposal with temporary ID
+ * Used for tracking pending proposals before acceptance
+ */
+export interface PendingProposalViewModel extends CardProposal {
+  id: string; // Temporary client-side UUID for React keys
+}
+
+/**
+ * Error banner state - represents error state for ErrorBanner component
+ */
+export interface ErrorBannerState {
+  type: "QUOTA_EXCEEDED" | "NETWORK_ERROR" | "INVALID_JSON" | "SERVER_ERROR" | "VALIDATION_ERROR";
+  message: string;
+  retryable: boolean;
+  retryCount?: number; // Optional: track retry attempts
+}
+
+/**
+ * Generation state - manages AI generation loading and error state
+ */
+export interface GenerationState {
+  isLoading: boolean;
+  error: ErrorBannerState | null;
+  retryCount: number; // Track retry attempts (max 2)
+}

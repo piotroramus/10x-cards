@@ -1,8 +1,10 @@
 ---
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
+import { GenerateReviewView } from "../components/GenerateReview/GenerateReviewView";
 ---
 
 <Layout>
-  <Welcome />
+  <div id="generate-review-view">
+    <GenerateReviewView client:load />
+  </div>
 </Layout>
