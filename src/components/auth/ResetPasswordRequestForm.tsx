@@ -2,20 +2,14 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/db/database.types";
-
-// Create Supabase client for password reset
-// Use PUBLIC_ prefixed env vars for client-side access
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY || import.meta.env.SUPABASE_KEY;
-const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+import { useAuth } from "@/components/providers/AuthProvider";
 
 /**
  * ResetPasswordRequestForm component for requesting password reset email
  * Handles email input and displays success message after submission
  */
 export function ResetPasswordRequestForm() {
+  const { resetPasswordRequest } = useAuth();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -39,12 +33,7 @@ export function ResetPasswordRequestForm() {
     try {
       const redirectTo = `${window.location.origin}/auth/reset-password/confirm`;
       
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo,
-        },
-      );
+      const { error: resetError } = await resetPasswordRequest(email, redirectTo);
 
       if (resetError) {
         setError(resetError.message || "An error occurred. Please try again.");

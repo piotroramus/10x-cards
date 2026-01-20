@@ -38,7 +38,8 @@ export function ResendVerificationEmailButton({
       // Placeholder: Simulate loading
       await new Promise((resolve) => setTimeout(resolve, 500));
       setSuccess(true);
-      console.log("Resend verification email would happen here", { email });
+      // TODO: Implement actual resend logic with Supabase if needed
+      // Currently handled by SignInForm's resend verification feature
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {

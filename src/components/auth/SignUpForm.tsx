@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,6 +39,41 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
     setPasswordConfirmation(e.target.value);
     setError(null);
   };
+
+  // Handle autofill by checking input values periodically
+  useEffect(() => {
+    const emailInput = document.getElementById("signup-email") as HTMLInputElement;
+    const passwordInput = document.getElementById("signup-password") as HTMLInputElement;
+    const confirmInput = document.getElementById("signup-password-confirmation") as HTMLInputElement;
+
+    if (!emailInput || !passwordInput || !confirmInput) return;
+
+    const syncInputs = () => {
+      if (emailInput.value !== email) setEmail(emailInput.value);
+      if (passwordInput.value !== password) setPassword(passwordInput.value);
+      if (confirmInput.value !== passwordConfirmation) setPasswordConfirmation(confirmInput.value);
+    };
+
+    // Listen for various events that might indicate autofill
+    const inputs = [emailInput, passwordInput, confirmInput];
+    inputs.forEach(input => {
+      input.addEventListener("input", syncInputs);
+      input.addEventListener("change", syncInputs);
+      input.addEventListener("blur", syncInputs);
+    });
+    
+    // Also check periodically (for autofill that doesn't fire events)
+    const interval = setInterval(syncInputs, 200);
+
+    return () => {
+      inputs.forEach(input => {
+        input.removeEventListener("input", syncInputs);
+        input.removeEventListener("change", syncInputs);
+        input.removeEventListener("blur", syncInputs);
+      });
+      clearInterval(interval);
+    };
+  }, [email, password, passwordConfirmation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,20 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/db/database.types";
-
-// Create Supabase client for password reset
-// Use PUBLIC_ prefixed env vars for client-side access
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY || import.meta.env.SUPABASE_KEY;
-const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+import { useAuth } from "@/components/providers/AuthProvider";
 
 interface ResetPasswordConfirmFormProps {
   token?: string;
@@ -26,6 +13,7 @@ interface ResetPasswordConfirmFormProps {
  * Handles password and password confirmation with validation
  */
 export function ResetPasswordConfirmForm({ token }: ResetPasswordConfirmFormProps) {
+  const { resetPasswordConfirm } = useAuth();
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [loading, setLoading] = useState(false);

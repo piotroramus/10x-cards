@@ -53,6 +53,8 @@ interface AuthContextValue {
   signOut: () => Promise<{ error: Error | null }>;
   getToken: () => string | null;
   resendVerificationEmail: (email: string) => Promise<{ error: Error | null }>;
+  resetPasswordRequest: (email: string, redirectTo: string) => Promise<{ error: Error | null }>;
+  resetPasswordConfirm: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -162,6 +164,36 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const resetPasswordRequest = async (email: string, redirectTo: string) => {
+    if (!supabase) {
+      return { error: new Error("Supabase client not initialized") };
+    }
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      });
+      return { error: error ? new Error(error.message) : null };
+    } catch (error) {
+      return { error: error instanceof Error ? error : new Error(String(error)) };
+    }
+  };
+
+  const resetPasswordConfirm = async (newPassword: string) => {
+    if (!supabase) {
+      return { error: new Error("Supabase client not initialized") };
+    }
+    
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      return { error: error ? new Error(error.message) : null };
+    } catch (error) {
+      return { error: error instanceof Error ? error : new Error(String(error)) };
+    }
+  };
+
   const value: AuthContextValue = {
     user,
     session,
@@ -172,6 +204,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signOut,
     getToken,
     resendVerificationEmail,
+    resetPasswordRequest,
+    resetPasswordConfirm,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
