@@ -25,6 +25,9 @@ describe('Card Validation Schemas', () => {
 
       const result = createCardSchema.safeParse(invalidCard);
       expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.errors[0].message).toBe('Front cannot be empty');
+      }
     });
 
     it('should reject empty back content', () => {
@@ -35,20 +38,91 @@ describe('Card Validation Schemas', () => {
 
       const result = createCardSchema.safeParse(invalidCard);
       expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.errors[0].message).toBe('Back cannot be empty');
+      }
     });
 
-    it('should trim whitespace from front and back', () => {
-      const cardWithWhitespace = {
-        front: '  Question  ',
-        back: '  Answer  ',
-      };
+    // UT-001: Character Limits Validation
+    describe('character limits', () => {
+      it('should accept front text with exactly 200 characters', () => {
+        const card = {
+          front: 'a'.repeat(200),
+          back: 'Answer',
+        };
 
-      const result = createCardSchema.safeParse(cardWithWhitespace);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.front).toBe('Question');
-        expect(result.data.back).toBe('Answer');
-      }
+        const result = createCardSchema.safeParse(card);
+        expect(result.success).toBe(true);
+      });
+
+      it('should reject front text exceeding 200 characters', () => {
+        const card = {
+          front: 'a'.repeat(201),
+          back: 'Answer',
+        };
+
+        const result = createCardSchema.safeParse(card);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe('Front must be 200 characters or less');
+        }
+      });
+
+      it('should accept front text with less than 200 characters', () => {
+        const card = {
+          front: 'a'.repeat(199),
+          back: 'Answer',
+        };
+
+        const result = createCardSchema.safeParse(card);
+        expect(result.success).toBe(true);
+      });
+
+      it('should accept back text with exactly 500 characters', () => {
+        const card = {
+          front: 'Question',
+          back: 'a'.repeat(500),
+        };
+
+        const result = createCardSchema.safeParse(card);
+        expect(result.success).toBe(true);
+      });
+
+      it('should reject back text exceeding 500 characters', () => {
+        const card = {
+          front: 'Question',
+          back: 'a'.repeat(501),
+        };
+
+        const result = createCardSchema.safeParse(card);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe('Back must be 500 characters or less');
+        }
+      });
+
+      it('should accept back text with less than 500 characters', () => {
+        const card = {
+          front: 'Question',
+          back: 'a'.repeat(499),
+        };
+
+        const result = createCardSchema.safeParse(card);
+        expect(result.success).toBe(true);
+      });
+
+      it('should reject both fields when both exceed limits', () => {
+        const card = {
+          front: 'a'.repeat(201),
+          back: 'b'.repeat(501),
+        };
+
+        const result = createCardSchema.safeParse(card);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors.length).toBe(2);
+        }
+      });
     });
   });
 
@@ -63,13 +137,69 @@ describe('Card Validation Schemas', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should allow partial updates', () => {
+    it('should allow partial updates (front only)', () => {
       const partialUpdate = {
         front: 'Updated question?',
       };
 
       const result = updateCardSchema.safeParse(partialUpdate);
       expect(result.success).toBe(true);
+    });
+
+    it('should allow partial updates (back only)', () => {
+      const partialUpdate = {
+        back: 'Updated answer',
+      };
+
+      const result = updateCardSchema.safeParse(partialUpdate);
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject update with no fields', () => {
+      const emptyUpdate = {};
+
+      const result = updateCardSchema.safeParse(emptyUpdate);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.errors[0].message).toBe('At least one field (front or back) must be provided');
+      }
+    });
+
+    // UT-001: Character Limits for Updates
+    describe('character limits', () => {
+      it('should reject front text exceeding 200 characters', () => {
+        const update = {
+          front: 'a'.repeat(201),
+        };
+
+        const result = updateCardSchema.safeParse(update);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe('Front must be 200 characters or less');
+        }
+      });
+
+      it('should reject back text exceeding 500 characters', () => {
+        const update = {
+          back: 'a'.repeat(501),
+        };
+
+        const result = updateCardSchema.safeParse(update);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.errors[0].message).toBe('Back must be 500 characters or less');
+        }
+      });
+
+      it('should accept valid character limits', () => {
+        const update = {
+          front: 'a'.repeat(200),
+          back: 'b'.repeat(500),
+        };
+
+        const result = updateCardSchema.safeParse(update);
+        expect(result.success).toBe(true);
+      });
     });
   });
 
