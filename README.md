@@ -58,6 +58,18 @@ Lang Memo (10x Cards) is designed to solve the problem of time-consuming manual 
   - Budget controls and API key management with spending limits
   - Server-side integration via Supabase Edge Functions
 
+### Testing
+
+- **[Vitest](https://vitest.dev/)** - Fast unit test framework for:
+  - Unit tests (validation, utilities, components)
+  - Integration tests (API endpoints, database, auth)
+  - Works seamlessly with Vite and TypeScript
+- **[Playwright](https://playwright.dev/)** - Modern E2E testing framework for:
+  - End-to-end user flow tests
+  - Cross-browser testing (Chromium, Firefox, WebKit)
+  - Full application stack validation
+- **[React Testing Library](https://testing-library.com/react)** - Testing utilities for React components
+
 ### CI/CD and Hosting
 
 - **GitHub Actions** - CI/CD pipelines
@@ -105,12 +117,25 @@ npm run build
 
 ## Available Scripts
 
+### Development
+
 - `npm run dev` - Start the Astro development server
 - `npm run build` - Build the application for production
 - `npm run preview` - Preview the production build locally
+
+### Code Quality
+
 - `npm run lint` - Run ESLint to check for code issues
 - `npm run lint:fix` - Automatically fix ESLint issues
 - `npm run format` - Format code with Prettier
+
+### Testing
+
+- `npm run test` - Run unit and integration tests with Vitest
+- `npm run test:ui` - Run Vitest with UI dashboard
+- `npm run test:coverage` - Generate test coverage report
+- `npm run test:e2e` - Run end-to-end tests with Playwright
+- `npm run test:e2e:ui` - Run Playwright tests in UI mode
 
 ## Project Scope
 
