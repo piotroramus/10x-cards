@@ -1,6 +1,8 @@
 import React from "react";
 import { GenerateReviewContainer } from "./GenerateReviewContainer";
 import { PendingProposalsProvider, AuthProvider, AnalyticsProvider } from "@/components/providers";
+import { AppHeader } from "@/components/AppHeader";
+import { ToastContainer } from "@/components/Toast";
 
 /**
  * GenerateReviewView - Client-side wrapper that provides all context providers
@@ -9,11 +11,17 @@ import { PendingProposalsProvider, AuthProvider, AnalyticsProvider } from "@/com
 export function GenerateReviewView() {
   return (
     <AuthProvider>
-      <PendingProposalsProvider>
-        <AnalyticsProvider>
-          <GenerateReviewContainer />
-        </AnalyticsProvider>
-      </PendingProposalsProvider>
+      <div className="min-h-screen flex flex-col">
+        <AppHeader />
+        <main className="flex-1">
+          <PendingProposalsProvider>
+            <AnalyticsProvider>
+              <GenerateReviewContainer />
+            </AnalyticsProvider>
+          </PendingProposalsProvider>
+        </main>
+        <ToastContainer />
+      </div>
     </AuthProvider>
   );
 }

@@ -1,6 +1,16 @@
 import type { ErrorCode, ErrorResponse } from "../../types.ts";
 
 /**
+ * Not found error thrown when a resource is not found or not owned by user
+ */
+export class NotFoundError extends Error {
+  constructor(message: string = "Resource not found") {
+    super(message);
+    this.name = "NotFoundError";
+  }
+}
+
+/**
  * Creates a validation error response
  * 
  * @param message - Error message
@@ -107,6 +117,11 @@ export function handleApiError(
     // Check for AuthenticationError (from auth.ts)
     if (error.name === "AuthenticationError") {
       return createAuthenticationError(error.message);
+    }
+
+    // Check for NotFoundError
+    if (error.name === "NotFoundError") {
+      return createNotFoundError(error.message);
     }
 
     // Log server errors (but don't expose details to client)

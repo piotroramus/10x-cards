@@ -83,17 +83,24 @@ interface PendingProposalsProviderProps {
  * Generates temporary UUIDs for React keys and handles storage errors gracefully
  */
 export function PendingProposalsProvider({ children }: PendingProposalsProviderProps) {
-  const [proposals, setProposals] = useState<PendingProposalViewModel[]>(() => {
-    // Initialize from localStorage on mount
-    return loadFromStorage();
-  });
+  // Start with empty array to match SSR, load from storage after hydration
+  const [proposals, setProposals] = useState<PendingProposalViewModel[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Sync to localStorage whenever proposals change
+  // Load from localStorage after hydration (client-side only)
   useEffect(() => {
+    setProposals(loadFromStorage());
+    setIsHydrated(true);
+  }, []);
+
+  // Sync to localStorage whenever proposals change (after hydration)
+  useEffect(() => {
+    if (!isHydrated) return;
+    
     // Convert ViewModels back to CardProposals for storage (remove temporary IDs)
     const proposalsToStore: CardProposal[] = proposals.map(({ id, ...proposal }) => proposal);
     saveToStorage(proposalsToStore);
-  }, [proposals]);
+  }, [proposals, isHydrated]);
 
   const addProposals = useCallback((newProposals: CardProposal[]) => {
     setProposals((prev) => {

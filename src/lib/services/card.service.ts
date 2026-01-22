@@ -1,9 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "../../db/database.types.ts";
-import type { CardDTO, CreateCardCommand } from "../../types.ts";
+import type { CardDTO, CreateCardCommand, AcceptProposalCommand, UpdateCardCommand } from "../../types.ts";
 import type { ListCardsQueryParams } from "../validations/cards.ts";
 import { AnalyticsService } from "./analytics.service.ts";
+import { NotFoundError } from "../errors/api-errors.ts";
 
 /**
  * Options for listing cards
@@ -151,6 +152,187 @@ export class CardService {
     });
 
     return card;
+  }
+
+  /**
+   * Accepts an AI-generated proposal and persists it as a card
+   * 
+   * @param command - The accept proposal command (front and back)
+   * @param userId - The authenticated user's ID
+   * @returns Promise resolving to the created card DTO
+   * @throws Error if database insert fails
+   */
+  async acceptProposal(command: AcceptProposalCommand, userId: string): Promise<CardDTO> {
+    // Insert card into database with origin='ai'
+    let data, error;
+    try {
+      const result = await this.supabase
+        .from("cards")
+        .insert({
+          user_id: userId,
+          front: command.front,
+          back: command.back,
+          origin: "ai",
+        })
+        .select("id, front, back, origin, created_at, updated_at")
+        .single();
+      data = result.data;
+      error = result.error;
+    } catch (fetchError) {
+      // Handle network/connection errors
+      const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+      throw new Error(
+        `Failed to connect to database: ${errorMessage}. ` +
+        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+      );
+    }
+
+    if (error) {
+      throw new Error(`Failed to accept proposal: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error("Proposal acceptance succeeded but no data returned");
+    }
+
+    // Transform database row to DTO
+    const card: CardDTO = {
+      id: data.id,
+      front: data.front,
+      back: data.back,
+      origin: data.origin as "ai" | "manual",
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+    };
+
+    // Create analytics event (non-blocking)
+    const analyticsService = new AnalyticsService(this.supabase);
+    await analyticsService.trackEvent(userId, "accept", "ai", {
+      card_id: card.id,
+    });
+
+    return card;
+  }
+
+  /**
+   * Updates an existing card
+   * 
+   * @param cardId - The card ID to update
+   * @param command - The update card command (partial front and/or back)
+   * @param userId - The authenticated user's ID
+   * @returns Promise resolving to the updated card DTO
+   * @throws NotFoundError if card not found or not owned by user
+   * @throws Error if database update fails
+   */
+  async updateCard(
+    cardId: string,
+    command: UpdateCardCommand,
+    userId: string
+  ): Promise<CardDTO> {
+    // Build the update object (only include provided fields)
+    const updateData: Record<string, string> = {};
+    if (command.front !== undefined) {
+      updateData.front = command.front;
+    }
+    if (command.back !== undefined) {
+      updateData.back = command.back;
+    }
+
+    // Update card in database
+    let data, error;
+    try {
+      const result = await this.supabase
+        .from("cards")
+        .update(updateData)
+        .eq("id", cardId)
+        .eq("user_id", userId)
+        .is("deleted_at", null)
+        .select("id, front, back, origin, created_at, updated_at")
+        .single();
+      data = result.data;
+      error = result.error;
+    } catch (fetchError) {
+      // Handle network/connection errors
+      const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+      throw new Error(
+        `Failed to connect to database: ${errorMessage}. ` +
+        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+      );
+    }
+
+    if (error) {
+      // Check if error is due to no rows found (card doesn't exist or not owned by user)
+      if (error.code === "PGRST116") {
+        throw new NotFoundError("Card not found or not owned by user");
+      }
+      throw new Error(`Failed to update card: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new NotFoundError("Card not found or not owned by user");
+    }
+
+    // Transform database row to DTO
+    const card: CardDTO = {
+      id: data.id,
+      front: data.front,
+      back: data.back,
+      origin: data.origin as "ai" | "manual",
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+    };
+
+    return card;
+  }
+
+  /**
+   * Soft-deletes a card by setting deleted_at timestamp
+   * 
+   * @param cardId - The card ID to delete
+   * @param userId - The authenticated user's ID
+   * @returns Promise resolving when deletion is complete
+   * @throws NotFoundError if card not found or not owned by user
+   * @throws Error if database update fails
+   */
+  async deleteCard(cardId: string, userId: string): Promise<void> {
+    // Soft delete by setting deleted_at timestamp
+    let error;
+    try {
+      const result = await this.supabase
+        .from("cards")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", cardId)
+        .eq("user_id", userId)
+        .is("deleted_at", null)
+        .select("id")
+        .single();
+      error = result.error;
+      
+      // Check if no rows were updated (card doesn't exist or not owned by user)
+      if (!result.data) {
+        throw new NotFoundError("Card not found or not owned by user");
+      }
+    } catch (fetchError) {
+      // If it's already a NotFoundError, re-throw it
+      if (fetchError instanceof NotFoundError) {
+        throw fetchError;
+      }
+      
+      // Handle network/connection errors
+      const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+      throw new Error(
+        `Failed to connect to database: ${errorMessage}. ` +
+        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+      );
+    }
+
+    if (error) {
+      // Check if error is due to no rows found
+      if (error.code === "PGRST116") {
+        throw new NotFoundError("Card not found or not owned by user");
+      }
+      throw new Error(`Failed to delete card: ${error.message}`);
+    }
   }
 }
 

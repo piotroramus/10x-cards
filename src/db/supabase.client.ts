@@ -5,7 +5,7 @@ import type { Database } from "../db/database.types.ts";
 export const cookieOptions: CookieOptionsWithName = {
   path: "/",
   secure: true,
-  httpOnly: true,
+  httpOnly: false, // Must be false so browser JS can read cookies for client-side auth
   sameSite: "lax",
 };
 

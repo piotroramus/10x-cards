@@ -202,9 +202,7 @@ export async function POST(context: APIContext): Promise<Response> {
     const errorResponse = handleApiError(error, {
       endpoint: "POST /api/cards",
       userId: context.locals.supabase ? "unknown" : undefined,
-    });
-
-    return new Response(JSON.stringify(errorResponse), {
+    });    return new Response(JSON.stringify(errorResponse), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

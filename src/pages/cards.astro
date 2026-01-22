@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { MyCardsView } from "../components/MyCards/MyCardsView";
+---
+
+<Layout>
+  <div id="my-cards-view">
+    <MyCardsView client:load />
+  </div>
+</Layout>

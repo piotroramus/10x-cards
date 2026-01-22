@@ -21,7 +21,7 @@ Guiding principles
 Technical overview (MVP)
 - Web app (desktop-first, responsive) with a single default collection of cards.
 - AI generation via OpenRouter using a budget model with server-side schema validation.
-- Authentication via email/password with email verification (Supabase). Sign-in is required to access the app; all actions require authentication.
+- Authentication via email/password with email verification (Supabase). Sign-in is required to access the app; all actions require authentication. A middleware authentication guard automatically redirects unauthenticated users to the sign-in page.
 - Persistence in a managed database (e.g., Supabase). Pending items live only on the client until acceptance.
 
 ## 2. User Problem
@@ -62,10 +62,13 @@ FR-4 Persistence model
 
 FR-5 Authentication and authorization
 - All application usage requires authentication; users must sign in before accessing features.
+- Automatic redirection: Unauthenticated users attempting to access any protected route (/, /cards, /practice) are automatically redirected to /auth/sign-in with the intended destination preserved as a returnUrl parameter.
 - Authentication via email/password with email verification (Supabase).
 - New accounts are created with email and password; a verification email is sent and must be confirmed before sign-in.
-- After successful login, return to the intended destination and continue the pending action when applicable.
+- After successful login, users are automatically returned to their intended destination (from returnUrl) and can continue any pending action.
+- Authenticated users attempting to access auth pages (except verification pages) are automatically redirected to the home page or their intended destination.
 - Users can sign out; their saved cards are private to their account.
+- Public routes (no authentication required): /auth/sign-in, /auth/sign-up, /auth/reset-password, /auth/reset-password/confirm, /auth/verify/*
 
 FR-6 Pending state handling
 - Pending proposals exist only client-side until acceptance.
@@ -183,8 +186,10 @@ ID: US-007
 Title: Require login to use the app
 Description: As a learner, I must sign in with email and password before using the app.
 Acceptance Criteria:
-- Unauthenticated users are prompted to sign in before accessing features.
-- After successful login, users return to their intended destination and can proceed.
+- Unauthenticated users attempting to access protected routes (/, /cards, /practice) are automatically redirected to the sign-in page.
+- The intended destination URL is preserved in the returnUrl query parameter (e.g., /auth/sign-in?returnUrl=%2F).
+- After successful login, users are automatically returned to their intended destination.
+- Authenticated users attempting to access auth pages are automatically redirected to the home page.
 
 ### US-031 Sign up and verify email
 ID: US-031
@@ -351,7 +356,9 @@ ID: US-028
 Title: Resume action after login
 Description: As a learner, my in-progress action continues seamlessly after logging in.
 Acceptance Criteria:
-- If my session expires and I am prompted to log in, upon success the original action completes without losing edits.
+- If my session expires or I access a protected route while unauthenticated, I am automatically redirected to the sign-in page with my intended destination preserved.
+- After successful authentication, I am automatically returned to my original destination without manual navigation.
+- My pending proposals and any in-progress edits are preserved across the authentication flow (via localStorage).
 
 ### US-029 Invalid JSON from AI
 ID: US-029
