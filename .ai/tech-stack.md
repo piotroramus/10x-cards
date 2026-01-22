@@ -24,7 +24,28 @@
   - Budget controls and API key management with spending limits
   - Server-side integration via Supabase Edge Functions
 
+## Testing
+
+- **Vitest** - Fast, modern unit testing framework:
+  - Unit tests for validation schemas, utilities, and business logic
+  - Integration tests for API endpoints, database operations, and auth flows
+  - Built on Vite for fast execution and hot module replacement
+  - Native TypeScript support
+- **Playwright** - End-to-end testing framework:
+  - Complete user flow testing from UI to database
+  - Cross-browser testing (Chromium, Firefox, WebKit)
+  - Built-in test runner with parallelization
+  - Screenshot and video recording on failures
+- **React Testing Library** - Component testing utilities:
+  - Test React components in isolation
+  - User-centric testing approach
+  - Integrates seamlessly with Vitest
+
 ## CI/CD and Hosting
 
-- **GitHub Actions** - CI/CD pipelines
+- **GitHub Actions** - CI/CD pipelines:
+  - Automated testing (unit, integration, E2E)
+  - Code quality checks (ESLint, Prettier, TypeScript)
+  - Build verification
+  - Deployment automation
 - **DigitalOcean** - Application hosting via Docker container

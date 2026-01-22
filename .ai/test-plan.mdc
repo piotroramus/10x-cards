@@ -1,0 +1,404 @@
+# Test Plan - Lang Memo
+
+## 1. Overview
+
+### 1.1 Purpose
+This document defines the essential testing strategy for Lang Memo - a web application that reduces the friction of creating effective study flashcards by using AI to generate high-quality card proposals from pasted English text.
+
+### 1.2 Product Flow
+**paste → generate → review/edit → accept/reject → practice**
+
+### 1.3 Key Principles to Test
+- Strict quality and length constraints enforcement
+- Only explicit user-accepted content persisted
+- **No raw source text stored server-side** (critical privacy requirement)
+- Authentication required for all features
+- Single default collection (no deck management)
+
+### 1.4 Success Metrics (KPIs)
+- **AI Acceptance Rate**: ≥75% of generated proposals accepted
+- **AI Card Share**: ≥75% of all created cards originate from AI
+- **API Response Time**: Standard CRUD <500ms, AI Generation <10s
+- **Test Coverage**: ≥80% for critical paths
+- **Privacy Compliance**: 0 instances of raw source text stored server-side
+
+## 2. Test Scope
+
+### 2.1 In Scope (Aligned with PRD)
+
+**Authentication & Authorization** (FR-5, US-007, US-031, US-028)
+- Email/password with email verification
+- Automatic redirection with returnUrl preservation
+- Protected routes require authentication
+
+**AI Flashcard Generation** (FR-1, US-001, US-002)
+- Input: max 10,000 characters
+- Output: maximum 5 proposed cards per generation
+- Character limits: front ≤200, back ≤500
+- Server-side JSON schema validation
+
+**Proposal Review & Editing** (FR-2, US-003-006)
+- Inline editing with real-time validation
+- Accept/Reject flows
+- No persistence until explicit Accept
+
+**Card Management** (FR-4, US-009-012)
+- Create, list, edit, delete (soft delete)
+- Manual and AI origin tracking
+- Duplicates allowed
+
+**Practice Mode** (FR-7, US-013-016)
+- Shuffle cards, reveal back, mark correct/incorrect
+- Keyboard shortcuts (space, 1, 2)
+- Session summary
+
+**Privacy & Security** (FR-10, US-024, US-030)
+- Raw source text NOT stored server-side
+- Row Level Security (RLS) enforcement
+- XSS prevention
+
+**Analytics** (FR-9, US-025)
+- Events: generate, accept, reject, manual_create, practice_done
+- 90-day retention
+- No raw source text in events
+
+**Error Handling** (FR-8, US-019, US-020, US-027, US-029)
+- Quota/rate limit errors
+- Network/model errors with retry
+- Empty states
+
+### 2.2 Out of Scope (MVP)
+- Spaced-repetition algorithms (SM-2)
+- Multiple collections/decks
+- Import formats (PDF, DOCX)
+- Sharing between users
+- "Accept All" feature
+- Card export
+- Account deletion
+
+## 3. Test Types & Framework
+
+**Testing Stack**: Vitest + Playwright
+
+### 3.1 Unit Tests
+**Framework**: Vitest + React Testing Library  
+**Focus**: Validation schemas, data transformations, utility functions, React components  
+**Execution**: Fast, isolated tests running in Node environment
+
+### 3.2 Integration Tests
+**Framework**: Vitest  
+**Focus**: API endpoints with database, Supabase Auth, OpenRouter API, RLS policies  
+**Execution**: Tests with test database instance, mocked external services where needed
+
+### 3.3 E2E Tests
+**Framework**: Playwright  
+**Focus**: Complete user flows from UI to database  
+**Browsers**: Chromium (primary), Firefox, WebKit  
+**Execution**: Full application stack with real browser automation
+
+## 4. Critical Test Scenarios
+
+### 4.1 Unit Tests
+
+#### UT-001: Card Character Limits Validation (US-004)
+**Priority**: Critical  
+**Test**:
+- Front text: reject >200 chars, accept ≤200
+- Back text: reject >500 chars, accept ≤500
+- Empty fields: reject both front and back
+
+#### UT-002: AI Generation Input Validation (US-002)
+**Priority**: Critical  
+**Test**:
+- Accept exactly 10,000 characters
+- Reject >10,000 characters
+- Validate minimum input length
+
+#### UT-003: CharacterCounter Component (US-026)
+**Priority**: High  
+**Test**:
+- Display correct character count
+- Show warning when approaching limit (>80%)
+- Show error when exceeding limit
+
+#### UT-004: AI Response Parsing (US-029)
+**Priority**: Critical  
+**Test**:
+- Parse valid JSON with multiple cards
+- Handle invalid JSON gracefully
+- Validate cards within response
+- Handle empty cards array
+
+#### UT-005: Privacy - Raw Source Text Not Stored (US-024)
+**Priority**: Critical (Privacy)  
+**Test**:
+- Analytics events do NOT contain raw source text
+- Server logs do NOT contain raw source text
+- Only metadata included in analytics (character_count, proposal_count)
+
+---
+
+### 4.2 Integration Tests
+
+#### IT-001: Card Creation via API (US-009, US-023)
+**Priority**: Critical  
+**Tests**:
+1. Create card with manual origin
+2. Reject card exceeding character limits (400 Bad Request)
+3. Verify card persisted in database
+4. Track manual_create event in analytics
+
+#### IT-002: AI Generation via API (US-001, US-024)
+**Priority**: Critical  
+**Tests**:
+1. Generate proposals with valid input (return 1-5 proposals)
+2. Reject input >10,000 characters (400 Bad Request)
+3. **CRITICAL**: Verify raw source text NOT stored in database
+4. **CRITICAL**: Verify raw source text NOT in analytics events
+5. Track generate event (without raw text)
+6. Handle invalid JSON from AI model gracefully
+
+#### IT-003: Row Level Security (RLS) (US-023)
+**Priority**: Critical (Security)  
+**Tests**:
+1. User can read their own cards
+2. User CANNOT read another user's cards (404 Not Found)
+3. List cards returns only user's own cards
+4. User CANNOT delete another user's cards
+5. Verify RLS policies at database level
+
+#### IT-004: Authentication Middleware (US-007, US-017)
+**Priority**: Critical  
+**Tests**:
+1. Unauthenticated requests to protected routes → redirect to sign-in
+2. returnUrl preserved in redirect
+3. Authenticated users can access protected routes
+4. Generate endpoint requires authentication
+
+---
+
+### 4.3 End-to-End Tests
+
+#### E2E-001: Complete AI Generation Flow (US-001, US-003, US-005, Main Happy Path)
+**Priority**: Critical  
+**Scenario**: User generates AI proposals and accepts one
+
+**Steps**:
+1. Sign in
+2. Paste text into generation input (sample: photosynthesis explanation)
+3. Verify character counter updates
+4. Click Generate button
+5. Wait for proposals (loading state shown, max 15s)
+6. Verify 1-5 proposals displayed
+7. Accept first proposal
+8. Verify success toast shown
+9. Navigate to My Cards
+10. Verify card appears in list with AI origin badge
+
+**Expected**:
+- Proposals conform to character limits
+- Accepted card persisted with origin=ai
+- Card visible in user's collection
+
+#### E2E-002: Generation with Input Exceeding Limit (US-002)
+**Priority**: High  
+**Scenario**: User prevented from generating with text >10,000 chars
+
+**Steps**:
+1. Navigate to home
+2. Paste text >10,000 characters
+3. Verify Generate button disabled
+4. Verify error message shown
+
+**Expected**:
+- Generate button disabled
+- Clear error message displayed
+
+#### E2E-003: Authentication Flow with Redirect (US-007, US-028)
+**Priority**: Critical  
+**Scenario**: Unauthenticated user redirected, then returned to original destination
+
+**Steps**:
+1. Try to access /cards without authentication
+2. Verify redirect to /auth/sign-in?returnUrl=%2Fcards
+3. Sign in with valid credentials
+4. Verify automatic redirect back to /cards
+5. Verify cards page displayed
+
+**Expected**:
+- Seamless redirect flow
+- User returned to intended destination
+- No manual navigation required
+
+#### E2E-004: Sign Up with Email Verification (US-031)
+**Priority**: High  
+**Scenario**: New user creates account and verifies email
+
+**Steps**:
+1. Navigate to /auth/sign-up
+2. Fill email and password
+3. Submit form
+4. Verify email verification message shown
+5. Attempt sign-in without verification
+6. Verify "Email not verified" error shown
+7. Verify "Resend verification" option available
+
+**Expected**:
+- Clear verification flow
+- Helpful error messages
+- Option to resend verification
+
+#### E2E-005: Practice Mode Complete Session (US-013-016)
+**Priority**: High  
+**Scenario**: User completes practice session with keyboard shortcuts
+
+**Steps**:
+1. Navigate to /practice (with ≥5 cards)
+2. Verify first card shows front only
+3. Press Space to reveal back
+4. Press 1 to mark correct
+5. Verify moved to next card
+6. Press Space, then 2 to mark incorrect
+7. Complete all cards
+8. Verify session summary displayed
+9. Verify statistics shown (X out of Y correct)
+
+**Expected**:
+- Keyboard shortcuts work correctly
+- Progress tracked accurately
+- Summary displayed at end
+- practice_done event tracked
+
+#### E2E-006: Proposal Editing Before Accept (US-003, US-004)
+**Priority**: High  
+**Scenario**: User edits proposal before accepting
+
+**Steps**:
+1. Generate proposals
+2. Edit front text of first proposal
+3. Verify character counter updates real-time
+4. Edit to exceed 200 characters
+5. Verify Accept button disabled
+6. Verify error message shown
+7. Reduce to ≤200 characters
+8. Verify Accept button enabled
+9. Accept proposal
+10. Verify edited content saved (not original)
+
+**Expected**:
+- Real-time validation works
+- Accept disabled when invalid
+- Edited content persisted
+- Origin remains 'ai' despite editing
+
+---
+
+## 5. Test Environment & Data
+
+### 5.1 Environments
+- **Local**: http://localhost:4321, Supabase Local/dev
+- **Staging**: TBD, Supabase staging
+- **Production**: TBD, Supabase production
+
+### 5.2 Test Users
+```
+test1@example.com / TestPass123! (10 cards: 5 AI, 5 manual)
+test2@example.com / TestPass123! (50 cards: 40 AI, 10 manual)
+test3@example.com / TestPass123! (0 cards - empty state)
+```
+
+### 5.3 Test Texts for AI Generation
+- Short: ~100 characters
+- Medium: 500-1000 characters (typical)
+- Long: ~10,000 characters (edge case)
+- Topics: Science, history, technology
+
+---
+
+## 6. Acceptance Criteria
+
+### 6.1 Pass Requirements
+- **Unit Tests**: 100% pass, ≥80% coverage on critical paths
+- **Integration Tests**: 100% pass, all API endpoints covered
+- **E2E Tests**: 100% pass on critical paths, ≥95% overall
+- **RLS Policies**: 100% effective (verified)
+- **Privacy**: 0 instances of raw source text stored
+
+### 6.2 Performance Criteria
+- API response: <500ms (p95) for CRUD
+- AI generation: <10s (p95) for typical inputs
+- Database queries: <100ms (p95)
+
+### 6.3 Security Criteria
+- RLS: No access to other users' data
+- XSS/SQL Injection: Zero vulnerabilities
+- JWT: All invalid tokens rejected
+
+### 6.4 Release Blockers
+Release CANNOT proceed if:
+- Any critical test fails
+- Any security test fails
+- Coverage <70% on critical paths
+- Any P0/P1 bugs open
+- Performance degradation >20% vs previous release
+
+---
+
+## 7. CI/CD Integration
+
+### 7.1 GitHub Actions Pipeline
+**Triggers**: Push, Pull Request
+
+**Jobs**:
+1. Lint (ESLint, Prettier)
+2. TypeScript compilation
+3. Unit tests (Vitest)
+4. Integration tests (with test DB)
+5. E2E smoke tests (critical paths only)
+6. Build verification
+
+### 7.2 Pre-commit Hooks
+- Lint staged files
+- Format with Prettier
+- Run relevant unit tests
+
+---
+
+## 8. Key Risks & Mitigation
+
+### 8.1 OpenRouter API Unavailability
+**Impact**: High - AI generation fails  
+**Mitigation**: Graceful error handling, suggest manual creation, monitor status page
+
+### 8.2 RLS Policy Bypass
+**Impact**: Critical - data leak  
+**Mitigation**: Dedicated security tests for each policy, code review for RLS changes, automated tests in CI/CD
+
+### 8.3 Raw Source Text Accidentally Stored
+**Impact**: Critical - privacy violation  
+**Mitigation**: Specific tests verify text NOT in DB/logs/analytics, code review for all data persistence
+
+### 8.4 Test Environment Drift
+**Impact**: High - tests don't catch production bugs  
+**Mitigation**: Staging mirrors production, smoke tests on production after deploy
+
+---
+
+## 9. Definitions
+
+- **RLS**: Row Level Security - PostgreSQL security mechanism
+- **JWT**: JSON Web Token - authentication token
+- **E2E**: End-to-End - complete user flow tests
+- **P0/P1**: Critical/High priority bugs
+
+## 10. References
+
+- **PRD**: `.ai/prd.md`
+- **API Plan**: `.ai/api-plan.md`
+- **Database Schema**: `supabase/migrations/`
+- **Tech Stack**: `.ai/tech-stack.md`
+
+---
+
+**Last Updated**: 2026-01-22  
+**Review**: After major feature releases
