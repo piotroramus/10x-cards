@@ -28,5 +28,7 @@ coverage/
 
 # playwright
 playwright-report/
+playwright-report.zip
+playwright/
 test-results/
 playwright/.cache/
