@@ -1,4 +1,4 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator, expect } from "@playwright/test";
 
 /**
  * Page Object Model for Home/Generate page
@@ -41,13 +41,23 @@ export class HomePage {
 
   async goto() {
     await this.page.goto("/");
+    // Wait for React to hydrate - ensure key elements are visible and interactive
+    await this.textInput.waitFor({ state: "visible", timeout: 10000 });
+    await this.generateButton.waitFor({ state: "visible", timeout: 10000 });
+    // Additional wait for event listeners to attach
+    await this.page.waitForTimeout(300);
   }
 
   async pasteText(text: string) {
     await this.textInput.fill(text);
+    // Wait for the input value to be set (handles React state updates)
+    await expect(this.textInput).toHaveValue(text, { timeout: 5000 });
   }
 
   async clickGenerate() {
+    // Wait for the generate button to be enabled before clicking
+    // The button is disabled when text is empty, too long, user is not authenticated, or generation is in progress
+    await expect(this.generateButton).toBeEnabled({ timeout: 10000 });
     await this.generateButton.click();
   }
 
