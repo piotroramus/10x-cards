@@ -33,13 +33,15 @@ export function AppHeader() {
           <nav className="flex items-center gap-1">
             <a
               href="/"
-              className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground aria-[current=page]:text-primary aria-[current=page]:after:absolute aria-[current=page]:after:bottom-0 aria-[current=page]:after:left-0 aria-[current=page]:after:right-0 aria-[current=page]:after:h-0.5 aria-[current=page]:after:bg-primary aria-[current=page]:after:rounded-full"
+              aria-current={typeof window !== "undefined" && window.location.pathname === "/" ? "page" : undefined}
             >
               Generate
             </a>
             <a
               href="/cards"
-              className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground aria-[current=page]:text-primary aria-[current=page]:after:absolute aria-[current=page]:after:bottom-0 aria-[current=page]:after:left-0 aria-[current=page]:after:right-0 aria-[current=page]:after:h-0.5 aria-[current=page]:after:bg-primary aria-[current=page]:after:rounded-full"
+              aria-current={typeof window !== "undefined" && window.location.pathname === "/cards" ? "page" : undefined}
             >
               My Cards
             </a>

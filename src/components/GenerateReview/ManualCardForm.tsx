@@ -73,7 +73,7 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
       {!collapsed && (
         <form id="manual-card-form-content" onSubmit={handleSubmit} className="space-y-4 p-4 pt-0">
           <div className="space-y-2">
-            <label htmlFor="manual-front" className="text-sm font-medium">
+            <label htmlFor="manual-front" className="text-sm font-semibold text-primary">
               Front
             </label>
             <input
@@ -107,7 +107,7 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="manual-back" className="text-sm font-medium">
+            <label htmlFor="manual-back" className="text-sm font-semibold text-primary">
               Back
             </label>
             <textarea

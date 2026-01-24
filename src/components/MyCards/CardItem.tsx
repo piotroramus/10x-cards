@@ -49,7 +49,7 @@ export function CardItem({ card, onDelete, onUpdate }: CardItemProps) {
 
   if (isEditing) {
     return (
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
+      <div className="rounded-lg border-l-2 border-l-primary border-y border-r bg-card p-6 shadow-sm">
         <CardEditor front={card.front} back={card.back} onSave={handleSaveEdit} onCancel={handleCancelEdit} />
       </div>
     );
@@ -57,15 +57,15 @@ export function CardItem({ card, onDelete, onUpdate }: CardItemProps) {
 
   return (
     <>
-      <div className="rounded-lg border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
+      <div className="rounded-lg border-l-2 border-l-primary border-y border-r bg-card p-7 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="mb-3">
               <div className="mb-1 flex items-center gap-2">
-                <span className="text-xs font-medium text-muted-foreground">FRONT</span>
+                <span className="text-xs font-semibold text-primary">FRONT</span>
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                    card.origin === "ai" ? "bg-primary/10 text-primary" : "bg-secondary/50 text-secondary-foreground"
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    card.origin === "ai" ? "bg-primary/15 text-primary" : "bg-secondary/50 text-secondary-foreground"
                   }`}
                 >
                   {card.origin === "ai" ? "AI" : "Manual"}
@@ -76,7 +76,7 @@ export function CardItem({ card, onDelete, onUpdate }: CardItemProps) {
 
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex w-full items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
+              className="flex w-full items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-primary"
             >
               {isExpanded ? (
                 <>
@@ -93,7 +93,7 @@ export function CardItem({ card, onDelete, onUpdate }: CardItemProps) {
 
             {isExpanded && (
               <div className="mt-3 rounded-md bg-muted/50 p-4">
-                <div className="mb-1 text-xs font-medium text-muted-foreground">BACK</div>
+                <div className="mb-1 text-xs font-semibold text-primary">BACK</div>
                 <p className="text-sm">{card.back}</p>
               </div>
             )}

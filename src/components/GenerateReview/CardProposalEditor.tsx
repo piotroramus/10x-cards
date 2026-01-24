@@ -68,9 +68,9 @@ export function CardProposalEditor({
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex
-    <section className="space-y-4 rounded-md border bg-card p-4" onKeyDown={handleKeyDown} role="group" tabIndex={0}>
+    <section className="space-y-4 rounded-md border-l-[3px] border-l-primary border-y border-r bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md" onKeyDown={handleKeyDown} role="group" tabIndex={0}>
       <div className="space-y-2">
-        <label htmlFor={`proposal-front-${proposal.id}`} className="text-sm font-medium">
+        <label htmlFor={`proposal-front-${proposal.id}`} className="text-sm font-semibold text-primary">
           Front
         </label>
         <input
@@ -103,7 +103,7 @@ export function CardProposalEditor({
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`proposal-back-${proposal.id}`} className="text-sm font-medium">
+        <label htmlFor={`proposal-back-${proposal.id}`} className="text-sm font-semibold text-primary">
           Back
         </label>
         <textarea

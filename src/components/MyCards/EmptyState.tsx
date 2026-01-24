@@ -7,9 +7,9 @@ import { FileText, Plus } from "lucide-react";
  */
 export function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-      <div className="mb-4 rounded-full bg-muted p-4">
-        <FileText className="size-8 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-primary/5 py-16 text-center">
+      <div className="mb-4 rounded-full bg-primary/10 p-4">
+        <FileText className="size-8 text-primary" />
       </div>
       <h2 className="mb-2 text-xl font-semibold">No cards yet</h2>
       <p className="mb-6 max-w-md text-sm text-muted-foreground">
