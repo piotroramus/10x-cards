@@ -19,7 +19,11 @@ export function EmptyState({ title, message, actionLabel, onAction, icon }: Empt
       <h3 className="text-lg font-semibold">{title}</h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-sm">{message}</p>
       {actionLabel && onAction && (
-        <Button variant="outline" className="mt-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={onAction}>
+        <Button
+          variant="outline"
+          className="mt-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+          onClick={onAction}
+        >
           {actionLabel}
         </Button>
       )}

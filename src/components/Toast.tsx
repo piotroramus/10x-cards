@@ -44,8 +44,10 @@ function ToastItem({ toast: t }: { toast: Toast }) {
         "pointer-events-auto flex items-center gap-3 rounded-lg px-4 py-3 shadow-lg border transition-all",
         "animate-in slide-in-from-right-full duration-300",
         "min-w-[320px] max-w-md",
-        t.type === "success" && "bg-primary/10 text-primary border-primary/20 dark:bg-primary/15 dark:border-primary/30",
-        t.type === "error" && "bg-destructive/10 text-destructive border-destructive/20 dark:bg-destructive/15 dark:border-destructive/30",
+        t.type === "success" &&
+          "bg-primary/10 text-primary border-primary/20 dark:bg-primary/15 dark:border-primary/30",
+        t.type === "error" &&
+          "bg-destructive/10 text-destructive border-destructive/20 dark:bg-destructive/15 dark:border-destructive/30",
         t.type === "info" && "bg-accent text-accent-foreground border-border"
       )}
       role="alert"

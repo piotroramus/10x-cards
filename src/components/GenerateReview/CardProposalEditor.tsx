@@ -67,8 +67,12 @@ export function CardProposalEditor({
   };
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex
-    <section className="space-y-4 rounded-md border-l-[3px] border-l-primary border-y border-r bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md" onKeyDown={handleKeyDown} role="group" tabIndex={0}>
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+    <section
+      className="space-y-4 rounded-md border-l-[3px] border-l-primary border-y border-r bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md"
+      onKeyDown={handleKeyDown}
+      role="group"
+    >
       <div className="space-y-2">
         <label htmlFor={`proposal-front-${proposal.id}`} className="text-sm font-semibold text-primary">
           Front

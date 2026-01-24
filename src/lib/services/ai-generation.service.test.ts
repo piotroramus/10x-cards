@@ -70,7 +70,6 @@ describe("AIGenerationService", () => {
 
     // Replace the internal openRouter chat method with our mock
     // Using any here is necessary for test mocking private properties
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     (service as unknown as { openRouter: { chat: typeof mockChat } }).openRouter = {
       chat: mockChat,
     };

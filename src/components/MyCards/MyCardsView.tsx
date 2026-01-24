@@ -141,7 +141,10 @@ function MyCardsContent() {
               </p>
             )}
           </div>
-          <a href="/" className="text-sm font-medium text-primary transition-colors hover:text-primary/80 hover:underline">
+          <a
+            href="/"
+            className="text-sm font-medium text-primary transition-colors hover:text-primary/80 hover:underline"
+          >
             ← Back to Generate
           </a>
         </div>
