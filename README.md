@@ -137,8 +137,6 @@ npm run build
 - `npm run test:e2e` - Run end-to-end tests with Playwright
 - `npm run test:e2e:ui` - Run Playwright tests in UI mode
 
-**Note:** E2E tests require the dev server to be running. Start it in a separate terminal with `npm run dev` before running E2E tests.
-
 ## Project Scope
 
 ### In Scope (MVP)

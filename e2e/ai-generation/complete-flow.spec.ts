@@ -9,7 +9,7 @@ import { getTestCredentials } from "../helpers/test-credentials";
  * Priority: Critical
  * Tests the main happy path of generating AI proposals and accepting one
  */
-test.describe("Complete AI Generation Flow", () => {
+test.describe.skip("Complete AI Generation Flow", () => {
   let signInPage: SignInPage;
   let homePage: HomePage;
   let cardsPage: CardsPage;

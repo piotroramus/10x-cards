@@ -50,8 +50,13 @@ export class HomePage {
   }
 
   async pasteText(text: string) {
+    // Clear the textarea first
+    await this.textInput.clear();
+    // Use fill() which should trigger React's onChange properly
     await this.textInput.fill(text);
-    // Wait for the input value to be set (handles React state updates)
+    // Wait for React to process the change
+    await this.page.waitForTimeout(500);
+    // Verify the value was set
     await expect(this.textInput).toHaveValue(text, { timeout: 5000 });
   }
 
@@ -110,8 +115,12 @@ export class HomePage {
 
   async fillManualCard(front: string, back: string) {
     await this.expandManualForm();
+    await this.manualFrontInput.clear();
     await this.manualFrontInput.fill(front);
+    await this.manualBackInput.clear();
     await this.manualBackInput.fill(back);
+    // Wait for React to propagate changes to button state
+    await this.page.waitForTimeout(500);
   }
 
   async saveManualCard() {

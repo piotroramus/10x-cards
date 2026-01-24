@@ -1,0 +1,81 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - heading "Lang Memo" [level=1] [ref=e8]
+          - navigation [ref=e9]:
+            - link "Generate" [ref=e10] [cursor=pointer]:
+              - /url: /
+            - link "My Cards" [ref=e11] [cursor=pointer]:
+              - /url: /cards
+        - generic [ref=e12]:
+          - generic [ref=e13]: test@10xcards.dev
+          - button "Sign out" [ref=e14]:
+            - img
+            - text: Sign out
+    - main [ref=e15]:
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - heading "Generate Cards from Text" [level=1] [ref=e20]
+            - paragraph [ref=e21]: Paste your English text below and let AI generate flashcard proposals for you.
+          - generic [ref=e22]:
+            - generic [ref=e23]: Text input for card generation
+            - generic [ref=e24]:
+              - textbox "Text input for card generation" [active] [ref=e25]:
+                - /placeholder: Paste your text here (up to 10,000 characters)...
+              - generic [ref=e27]:
+                - generic [ref=e28]: 0 / 10000
+                - generic "Text input character count" [ref=e29]: 0 of 10000 characters
+          - generic [ref=e30]:
+            - button "Generate card proposals" [disabled]:
+              - generic: Generate
+            - status [ref=e31]: Enter text to generate proposals
+          - generic [ref=e32]:
+            - button "Create Card Manually" [expanded] [ref=e33]:
+              - heading "Create Card Manually" [level=3] [ref=e34]
+              - img [ref=e35]
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - text: Front
+                - textbox "Front" [ref=e39]
+                - generic [ref=e40]:
+                  - generic [ref=e41]:
+                    - generic [ref=e42]: 0 / 200
+                    - generic "Front text character count" [ref=e43]: 0 of 200 characters
+                  - alert [ref=e44]: Front is required
+              - generic [ref=e45]:
+                - text: Back
+                - textbox "Back" [ref=e46]
+                - generic [ref=e47]:
+                  - generic [ref=e48]:
+                    - generic [ref=e49]: 0 / 500
+                    - generic "Back text character count" [ref=e50]: 0 of 500 characters
+                  - alert [ref=e51]: Back is required
+              - button "Save Card" [disabled]
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - heading "Proposals" [level=2] [ref=e54]
+            - paragraph [ref=e55]: Review and edit proposals, then accept or reject them.
+          - generic [ref=e56]:
+            - heading "No proposals yet" [level=3] [ref=e57]
+            - paragraph [ref=e58]: Paste your text above and click Generate to create card proposals from AI.
+            - button "Scroll to input" [ref=e59]
+  - generic [ref=e62]:
+    - button "Menu" [ref=e63]:
+      - img [ref=e65]
+      - generic: Menu
+    - button "Inspect" [ref=e69]:
+      - img [ref=e71]
+      - generic: Inspect
+    - button "Audit" [ref=e73]:
+      - img [ref=e75]
+      - generic: Audit
+    - button "Settings" [ref=e78]:
+      - img [ref=e80]
+      - generic: Settings
+```

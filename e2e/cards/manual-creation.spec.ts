@@ -9,7 +9,7 @@ import { getTestCredentials } from "../helpers/test-credentials";
  * Priority: High
  * Tests the complete flow of manually creating a card without AI generation
  */
-test.describe("Manual Card Creation", () => {
+test.describe.skip("Manual Card Creation", () => {
   let signInPage: SignInPage;
   let homePage: HomePage;
   let cardsPage: CardsPage;

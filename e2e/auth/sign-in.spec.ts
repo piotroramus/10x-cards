@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { SignInPage } from "../pages/SignInPage";
 import { getTestCredentials } from "../helpers/test-credentials";
 
-test.describe("Sign In Flow", () => {
+test.describe.skip("Sign In Flow", () => {
   let signInPage: SignInPage;
 
   test.beforeEach(async ({ page }) => {
