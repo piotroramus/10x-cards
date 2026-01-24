@@ -23,7 +23,8 @@ export class SignInPage {
     await this.emailInput.waitFor({ state: "visible", timeout: 10000 });
     await this.passwordInput.waitFor({ state: "visible", timeout: 10000 });
     // Additional wait for event listeners to attach (handles polling mechanism)
-    await this.page.waitForTimeout(300);
+    // Increased for CI reliability (slower than local environment)
+    await this.page.waitForTimeout(500);
   }
 
   async signIn(email: string, password: string) {

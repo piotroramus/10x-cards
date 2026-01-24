@@ -24,7 +24,8 @@ export class CardsPage {
     // Wait for React to hydrate - ensure page title is visible
     await this.pageTitle.waitFor({ state: "visible", timeout: 10000 });
     // Additional wait for event listeners to attach
-    await this.page.waitForTimeout(300);
+    // Increased for CI reliability (slower than local environment)
+    await this.page.waitForTimeout(500);
   }
 
   async waitForCardsToLoad() {

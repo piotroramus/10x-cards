@@ -45,7 +45,8 @@ export class HomePage {
     await this.textInput.waitFor({ state: "visible", timeout: 10000 });
     await this.generateButton.waitFor({ state: "visible", timeout: 10000 });
     // Additional wait for event listeners to attach
-    await this.page.waitForTimeout(300);
+    // Increased for CI reliability (slower than local environment)
+    await this.page.waitForTimeout(500);
   }
 
   async pasteText(text: string) {
