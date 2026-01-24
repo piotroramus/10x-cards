@@ -19,8 +19,14 @@ export function CardList({ cards, onDelete, onUpdate, currentPage, totalPages, o
   return (
     <div>
       <div className="space-y-4">
-        {cards.map((card) => (
-          <CardItem key={card.id} card={card} onDelete={onDelete} onUpdate={onUpdate} />
+        {cards.map((card, index) => (
+          <div
+            key={card.id}
+            className="animate-in fade-in slide-in-from-bottom-4 duration-300"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            <CardItem card={card} onDelete={onDelete} onUpdate={onUpdate} />
+          </div>
         ))}
       </div>
 

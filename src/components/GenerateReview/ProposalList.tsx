@@ -44,8 +44,13 @@ export function ProposalList({
 
   return (
     <div className="space-y-4" role="list" aria-label="Card proposals">
-      {proposals.map((proposal) => (
-        <div key={proposal.id} role="listitem">
+      {proposals.map((proposal, index) => (
+        <div
+          key={proposal.id}
+          role="listitem"
+          className="animate-in fade-in slide-in-from-bottom-4 duration-300"
+          style={{ animationDelay: `${index * 100}ms` }}
+        >
           <CardProposalEditor
             proposal={proposal}
             onUpdate={onUpdate}

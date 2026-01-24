@@ -232,12 +232,12 @@ export function GenerateReviewContainer() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-10 lg:grid-cols-2">
         {/* Left Column: Input Area */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold">Generate Cards from Text</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <h1 className="text-3xl font-bold text-foreground">Generate Cards from Text</h1>
+            <p className="mt-3 text-base text-muted-foreground leading-relaxed">
               Paste your English text below and let AI generate flashcard proposals for you.
             </p>
           </div>
@@ -268,10 +268,10 @@ export function GenerateReviewContainer() {
         </div>
 
         {/* Right Column: Proposals List */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold">Proposals</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Review and edit proposals, then accept or reject them.</p>
+            <h2 className="text-2xl font-semibold text-foreground">Proposals</h2>
+            <p className="mt-2 text-base text-muted-foreground leading-relaxed">Review and edit proposals, then accept or reject them.</p>
           </div>
 
           <ProposalList

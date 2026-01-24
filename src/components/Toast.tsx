@@ -41,12 +41,12 @@ function ToastItem({ toast: t }: { toast: Toast }) {
   return (
     <div
       className={cn(
-        "pointer-events-auto flex items-center gap-3 rounded-lg px-4 py-3 shadow-lg",
+        "pointer-events-auto flex items-center gap-3 rounded-lg px-4 py-3 shadow-lg border transition-all",
         "animate-in slide-in-from-right-full duration-300",
         "min-w-[320px] max-w-md",
-        t.type === "success" && "bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-100",
-        t.type === "error" && "bg-red-50 text-red-900 dark:bg-red-900/20 dark:text-red-100",
-        t.type === "info" && "bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-100"
+        t.type === "success" && "bg-primary/10 text-primary border-primary/20 dark:bg-primary/15 dark:border-primary/30",
+        t.type === "error" && "bg-destructive/10 text-destructive border-destructive/20 dark:bg-destructive/15 dark:border-destructive/30",
+        t.type === "info" && "bg-accent text-accent-foreground border-border"
       )}
       role="alert"
     >
@@ -57,9 +57,9 @@ function ToastItem({ toast: t }: { toast: Toast }) {
         className={cn(
           "shrink-0 rounded-sm opacity-70 transition-opacity hover:opacity-100",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-          t.type === "success" && "focus-visible:ring-green-600",
-          t.type === "error" && "focus-visible:ring-red-600",
-          t.type === "info" && "focus-visible:ring-blue-600"
+          t.type === "success" && "focus-visible:ring-primary",
+          t.type === "error" && "focus-visible:ring-destructive",
+          t.type === "info" && "focus-visible:ring-ring"
         )}
         aria-label="Dismiss notification"
       >

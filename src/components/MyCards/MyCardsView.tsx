@@ -132,16 +132,16 @@ function MyCardsContent() {
       <AppHeader />
 
       <main className="container mx-auto flex-1 px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">My Cards</h1>
+            <h1 className="text-3xl font-bold text-foreground">My Cards</h1>
             {total > 0 && (
-              <p className="text-sm text-muted-foreground">
+              <p className="mt-2 text-base text-muted-foreground">
                 {total} {total === 1 ? "card" : "cards"} total
               </p>
             )}
           </div>
-          <a href="/" className="text-sm text-primary hover:underline">
+          <a href="/" className="text-sm font-medium text-primary transition-colors hover:text-primary/80 hover:underline">
             ← Back to Generate
           </a>
         </div>
