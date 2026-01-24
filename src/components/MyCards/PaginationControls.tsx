@@ -11,11 +11,7 @@ interface PaginationControlsProps {
 /**
  * PaginationControls component provides navigation between pages
  */
-export function PaginationControls({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: PaginationControlsProps) {
+export function PaginationControls({ currentPage, totalPages, onPageChange }: PaginationControlsProps) {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;

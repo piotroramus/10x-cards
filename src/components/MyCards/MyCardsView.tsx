@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { AuthProvider, useAuth } from "@/components/providers";
 import { ToastContainer } from "@/components/Toast";
@@ -22,45 +22,44 @@ function MyCardsContent() {
   const limit = 50;
 
   // Fetch cards from API
-  const fetchCards = async (page: number) => {
-    if (!session) return;
+  const fetchCards = useCallback(
+    async (page: number) => {
+      if (!session) return;
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await fetch(
-        `/api/cards?page=${page}&limit=${limit}`,
-        {
+      try {
+        const response = await fetch(`/api/cards?page=${page}&limit=${limit}`, {
           headers: {
             "Content-Type": "application/json",
           },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch cards");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch cards");
+        const data: ListCardsResponse = await response.json();
+        setCards(data.data);
+        setTotalPages(data.pagination.total_pages);
+        setTotal(data.pagination.total);
+        setCurrentPage(page);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to load cards";
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } finally {
+        setIsLoading(false);
       }
-
-      const data: ListCardsResponse = await response.json();
-      setCards(data.data);
-      setTotalPages(data.pagination.total_pages);
-      setTotal(data.pagination.total);
-      setCurrentPage(page);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to load cards";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [session, limit]
+  );
 
   // Initial fetch
   useEffect(() => {
     fetchCards(1);
-  }, [session]);
+  }, [session, fetchCards]);
 
   // Handle card deletion
   const handleDelete = async (cardId: string) => {
@@ -86,8 +85,7 @@ function MyCardsContent() {
       // Rollback on error
       setCards(previousCards);
       setTotal((prev) => prev + 1);
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete card";
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete card";
       toast.error(errorMessage);
     }
   };
@@ -97,11 +95,7 @@ function MyCardsContent() {
     // Optimistic update
     const previousCards = [...cards];
     setCards(
-      cards.map((card) =>
-        card.id === cardId
-          ? { ...card, front, back, updated_at: new Date().toISOString() }
-          : card
-      )
+      cards.map((card) => (card.id === cardId ? { ...card, front, back, updated_at: new Date().toISOString() } : card))
     );
 
     try {
@@ -118,15 +112,12 @@ function MyCardsContent() {
       }
 
       const updatedCard: CardDTO = await response.json();
-      setCards(
-        cards.map((card) => (card.id === cardId ? updatedCard : card))
-      );
+      setCards(cards.map((card) => (card.id === cardId ? updatedCard : card)));
       toast.success("Card updated successfully");
     } catch (err) {
       // Rollback on error
       setCards(previousCards);
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to update card";
+      const errorMessage = err instanceof Error ? err.message : "Failed to update card";
       toast.error(errorMessage);
     }
   };
@@ -150,10 +141,7 @@ function MyCardsContent() {
               </p>
             )}
           </div>
-          <a
-            href="/"
-            className="text-sm text-primary hover:underline"
-          >
+          <a href="/" className="text-sm text-primary hover:underline">
             ← Back to Generate
           </a>
         </div>
@@ -161,10 +149,7 @@ function MyCardsContent() {
         {error && (
           <div className="mb-6 rounded-md border border-destructive bg-destructive/10 p-4">
             <p className="text-sm text-destructive">{error}</p>
-            <button
-              onClick={() => fetchCards(currentPage)}
-              className="mt-2 text-sm text-primary hover:underline"
-            >
+            <button onClick={() => fetchCards(currentPage)} className="mt-2 text-sm text-primary hover:underline">
               Try again
             </button>
           </div>
@@ -173,10 +158,7 @@ function MyCardsContent() {
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="h-32 animate-pulse rounded-lg border bg-muted"
-              />
+              <div key={i} className="h-32 animate-pulse rounded-lg border bg-muted" />
             ))}
           </div>
         ) : cards.length === 0 ? (

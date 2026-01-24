@@ -2,7 +2,6 @@ import React, { useState, useCallback } from "react";
 import { TextInputArea } from "./TextInputArea";
 import { GenerateButton } from "./GenerateButton";
 import { ErrorBanner } from "./ErrorBanner";
-import { LoadingSkeleton } from "./LoadingSkeleton";
 import { ProposalList } from "./ProposalList";
 import { ManualCardForm } from "./ManualCardForm";
 import { usePendingProposals } from "@/components/providers";
@@ -11,14 +10,7 @@ import { useAnalytics } from "@/components/providers";
 import { generateProposals, acceptProposal, createCard, mapErrorToBannerState } from "@/lib/api/cards";
 import { ApiError } from "@/lib/api/cards";
 import { toast } from "@/lib/utils/toast";
-import type {
-  GenerateProposalsCommand,
-  AcceptProposalCommand,
-  CreateCardCommand,
-  CardProposal,
-  ErrorBannerState,
-  GenerationState,
-} from "@/types";
+import type { GenerateProposalsCommand, AcceptProposalCommand, CreateCardCommand, GenerationState } from "@/types";
 
 /**
  * GenerateReviewContainer - Main container component for Generate/Review view
@@ -41,19 +33,22 @@ export function GenerateReviewContainer() {
   });
 
   // Manual form state
-  const [isManualFormCollapsed, setIsManualFormCollapsed] = useState(false);
+  const [isManualFormCollapsed] = useState(false);
 
   // Accept/Reject state
   const [acceptingIds, setAcceptingIds] = useState<Set<string>>(new Set());
 
   // Handle text input change
-  const handleTextInputChange = useCallback((value: string) => {
-    setTextInput(value);
-    // Clear error when user starts typing
-    if (generationState.error) {
-      setGenerationState((prev) => ({ ...prev, error: null }));
-    }
-  }, [generationState.error]);
+  const handleTextInputChange = useCallback(
+    (value: string) => {
+      setTextInput(value);
+      // Clear error when user starts typing
+      if (generationState.error) {
+        setGenerationState((prev) => ({ ...prev, error: null }));
+      }
+    },
+    [generationState.error]
+  );
 
   // Handle generate proposals
   const handleGenerate = useCallback(async () => {
@@ -92,14 +87,15 @@ export function GenerateReviewContainer() {
       // Clear input after successful generation (optional)
       // setTextInput("");
     } catch (error) {
-      const bannerState = error instanceof ApiError
-        ? { ...mapErrorToBannerState(error), retryCount: generationState.retryCount }
-        : {
-            type: "NETWORK_ERROR" as const,
-            message: "An unexpected error occurred. Please try again.",
-            retryable: true,
-            retryCount: generationState.retryCount,
-          };
+      const bannerState =
+        error instanceof ApiError
+          ? { ...mapErrorToBannerState(error), retryCount: generationState.retryCount }
+          : {
+              type: "NETWORK_ERROR" as const,
+              message: "An unexpected error occurred. Please try again.",
+              retryable: true,
+              retryCount: generationState.retryCount,
+            };
 
       setGenerationState({
         isLoading: false,
@@ -181,9 +177,7 @@ export function GenerateReviewContainer() {
           return next;
         });
 
-        const message = error instanceof ApiError
-          ? error.message
-          : "Failed to save card. Please try again.";
+        const message = error instanceof ApiError ? error.message : "Failed to save card. Please try again.";
         toast.error(message);
       }
     },
@@ -218,9 +212,7 @@ export function GenerateReviewContainer() {
         toast.success("Card created successfully");
         // Analytics event is created automatically by API
       } catch (error) {
-        const message = error instanceof ApiError
-          ? error.message
-          : "Failed to create card. Please try again.";
+        const message = error instanceof ApiError ? error.message : "Failed to create card. Please try again.";
         toast.error(message);
       }
     },
@@ -228,7 +220,8 @@ export function GenerateReviewContainer() {
   );
 
   // Validation for generate button
-  const canGenerate = textInput.length > 0 && textInput.length <= 10000 && isAuthenticated && !generationState.isLoading;
+  const canGenerate =
+    textInput.length > 0 && textInput.length <= 10000 && isAuthenticated && !generationState.isLoading;
   const generateDisabledMessage = !isAuthenticated
     ? "Please sign in to generate"
     : textInput.length > 10000
@@ -271,19 +264,14 @@ export function GenerateReviewContainer() {
             />
           )}
 
-          <ManualCardForm
-            onCreate={handleCreateManual}
-            collapsed={isManualFormCollapsed}
-          />
+          <ManualCardForm onCreate={handleCreateManual} collapsed={isManualFormCollapsed} />
         </div>
 
         {/* Right Column: Proposals List */}
         <div className="space-y-4">
           <div>
             <h2 className="text-xl font-semibold">Proposals</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Review and edit proposals, then accept or reject them.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Review and edit proposals, then accept or reject them.</p>
           </div>
 
           <ProposalList
@@ -299,4 +287,3 @@ export function GenerateReviewContainer() {
     </div>
   );
 }
-

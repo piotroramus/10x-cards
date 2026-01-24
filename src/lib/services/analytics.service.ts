@@ -11,10 +11,10 @@ export class AnalyticsService {
 
   /**
    * Tracks an analytics event
-   * 
+   *
    * This method is designed to be non-blocking. If the event creation fails,
    * it logs the error but does not throw, allowing the calling code to continue.
-   * 
+   *
    * @param userId - The authenticated user's ID
    * @param eventType - Type of event to track
    * @param origin - Origin of the event ('ai', 'manual', or null)
@@ -25,17 +25,15 @@ export class AnalyticsService {
     userId: string,
     eventType: EventType,
     origin: AnalyticsOrigin,
-    context?: AnalyticsEventContext,
+    context?: AnalyticsEventContext
   ): Promise<void> {
     try {
-      const { error } = await this.supabase
-        .from("analytics_events")
-        .insert({
-          user_id: userId,
-          event_type: eventType,
-          origin: origin,
-          context: (context as Json) || null,
-        });
+      const { error } = await this.supabase.from("analytics_events").insert({
+        user_id: userId,
+        event_type: eventType,
+        origin: origin,
+        context: (context as Json) || null,
+      });
 
       if (error) {
         // Log error but don't throw - analytics should not block main operations
@@ -53,4 +51,3 @@ export class AnalyticsService {
     }
   }
 }
-

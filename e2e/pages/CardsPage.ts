@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator } from "@playwright/test";
 
 /**
  * Page Object Model for My Cards page
@@ -12,15 +12,15 @@ export class CardsPage {
   readonly totalCount: Locator;
 
   constructor(private page: Page) {
-    this.pageTitle = page.locator('h1', { hasText: 'My Cards' });
-    this.cardsList = page.locator('.rounded-lg.border.bg-card');
-    this.emptyState = page.locator('text=No cards yet');
+    this.pageTitle = page.locator("h1", { hasText: "My Cards" });
+    this.cardsList = page.locator(".rounded-lg.border.bg-card");
+    this.emptyState = page.locator("text=No cards yet");
     this.backToGenerateLink = page.locator('a[href="/"]');
-    this.totalCount = page.locator('text=/\\d+ cards? total/');
+    this.totalCount = page.locator("text=/\\d+ cards? total/");
   }
 
   async goto() {
-    await this.page.goto('/cards');
+    await this.page.goto("/cards");
   }
 
   async waitForCardsToLoad() {
@@ -40,32 +40,32 @@ export class CardsPage {
 
   async getCardOriginBadge(cardIndex: number) {
     const card = await this.getCardByIndex(cardIndex);
-    const badge = card.locator('span', { hasText: /^(AI|Manual)$/ });
+    const badge = card.locator("span", { hasText: /^(AI|Manual)$/ });
     return await badge.textContent();
   }
 
   async getCardFrontText(cardIndex: number) {
     const card = await this.getCardByIndex(cardIndex);
     // Find the front text (p element with text-base font-medium class)
-    const frontText = card.locator('p.text-base.font-medium').first();
+    const frontText = card.locator("p.text-base.font-medium").first();
     return await frontText.textContent();
   }
 
   async expandCard(cardIndex: number) {
     const card = await this.getCardByIndex(cardIndex);
-    const expandButton = card.locator('button', { hasText: 'Show answer' });
+    const expandButton = card.locator("button", { hasText: "Show answer" });
     await expandButton.click();
   }
 
   async getCardBackText(cardIndex: number) {
     const card = await this.getCardByIndex(cardIndex);
     // The back text appears after expanding in the muted background section
-    const backText = card.locator('.bg-muted\\/50 p.text-sm');
+    const backText = card.locator(".bg-muted\\/50 p.text-sm");
     return await backText.textContent();
   }
 
   async hasCard(frontText: string) {
-    const card = this.page.locator('.rounded-lg.border.bg-card', {
+    const card = this.page.locator(".rounded-lg.border.bg-card", {
       has: this.page.locator(`text="${frontText}"`),
     });
     return await card.isVisible();

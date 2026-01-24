@@ -49,10 +49,7 @@ async function createApiError(response: Response): Promise<ApiError> {
  * @returns Promise resolving to track event response
  * @throws ApiError if request fails
  */
-export async function trackEvent(
-  command: TrackEventCommand,
-  token: string
-): Promise<TrackEventResponse> {
+export async function trackEvent(command: TrackEventCommand, token: string): Promise<TrackEventResponse> {
   const response = await fetch("/api/analytics/events", {
     method: "POST",
     headers: {
@@ -68,4 +65,3 @@ export async function trackEvent(
 
   return await response.json();
 }
-

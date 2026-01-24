@@ -50,12 +50,7 @@ export function CardItem({ card, onDelete, onUpdate }: CardItemProps) {
   if (isEditing) {
     return (
       <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <CardEditor
-          front={card.front}
-          back={card.back}
-          onSave={handleSaveEdit}
-          onCancel={handleCancelEdit}
-        />
+        <CardEditor front={card.front} back={card.back} onSave={handleSaveEdit} onCancel={handleCancelEdit} />
       </div>
     );
   }
@@ -67,14 +62,10 @@ export function CardItem({ card, onDelete, onUpdate }: CardItemProps) {
           <div className="flex-1">
             <div className="mb-3">
               <div className="mb-1 flex items-center gap-2">
-                <span className="text-xs font-medium text-muted-foreground">
-                  FRONT
-                </span>
+                <span className="text-xs font-medium text-muted-foreground">FRONT</span>
                 <span
                   className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                    card.origin === "ai"
-                      ? "bg-primary/10 text-primary"
-                      : "bg-secondary/50 text-secondary-foreground"
+                    card.origin === "ai" ? "bg-primary/10 text-primary" : "bg-secondary/50 text-secondary-foreground"
                   }`}
                 >
                   {card.origin === "ai" ? "AI" : "Manual"}
@@ -102,36 +93,22 @@ export function CardItem({ card, onDelete, onUpdate }: CardItemProps) {
 
             {isExpanded && (
               <div className="mt-3 rounded-md bg-muted/50 p-4">
-                <div className="mb-1 text-xs font-medium text-muted-foreground">
-                  BACK
-                </div>
+                <div className="mb-1 text-xs font-medium text-muted-foreground">BACK</div>
                 <p className="text-sm">{card.back}</p>
               </div>
             )}
 
             <div className="mt-3 text-xs text-muted-foreground">
               Created {formatDate(card.created_at)}
-              {card.updated_at !== card.created_at && (
-                <> · Updated {formatDate(card.updated_at)}</>
-              )}
+              {card.updated_at !== card.created_at && <> · Updated {formatDate(card.updated_at)}</>}
             </div>
           </div>
 
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleEdit}
-              aria-label="Edit card"
-            >
+            <Button variant="outline" size="sm" onClick={handleEdit} aria-label="Edit card">
               <Pencil className="size-4" />
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowDeleteDialog(true)}
-              aria-label="Delete card"
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)} aria-label="Delete card">
               <Trash2 className="size-4" />
             </Button>
           </div>

@@ -4,7 +4,6 @@ import { getAuthenticatedUser } from "../../../lib/auth.ts";
 import {
   createAuthenticationError,
   createNotFoundError,
-  createServerError,
   createValidationError,
   handleApiError,
 } from "../../../lib/errors/api-errors.ts";
@@ -17,20 +16,20 @@ export const prerender = false;
 
 /**
  * PATCH /api/cards/:id
- * 
+ *
  * Updates an existing flashcard for the authenticated user.
- * 
+ *
  * Path Parameters:
  * - id: UUID of the card to update
- * 
+ *
  * Request Body:
  * - front: string (optional, 1-200 characters)
  * - back: string (optional, 1-500 characters)
- * 
+ *
  * Headers:
  * - Authorization: Bearer <supabase_jwt_token> (required)
  * - Content-Type: application/json (required)
- * 
+ *
  * @param context - Astro API context
  * @returns JSON response with updated card data
  */
@@ -41,13 +40,10 @@ export async function PATCH(context: APIContext): Promise<Response> {
     const idValidation = cardIdSchema.safeParse(cardId);
 
     if (!idValidation.success) {
-      return new Response(
-        JSON.stringify(createValidationError("Invalid card ID format")),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify(createValidationError("Invalid card ID format")), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Step 2: Authenticate user
@@ -58,14 +54,11 @@ export async function PATCH(context: APIContext): Promise<Response> {
     let body: unknown;
     try {
       body = await context.request.json();
-    } catch (error) {
-      return new Response(
-        JSON.stringify(createValidationError("Invalid JSON in request body")),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+    } catch {
+      return new Response(JSON.stringify(createValidationError("Invalid JSON in request body")), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Validate request body using Zod schema
@@ -79,13 +72,10 @@ export async function PATCH(context: APIContext): Promise<Response> {
         details[path] = err.message;
       });
 
-      return new Response(
-        JSON.stringify(createValidationError("Validation error", details)),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify(createValidationError("Validation error", details)), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const command = validationResult.data;
@@ -104,24 +94,18 @@ export async function PATCH(context: APIContext): Promise<Response> {
   } catch (error) {
     // Handle authentication errors
     if (error instanceof Error && error.name === "AuthenticationError") {
-      return new Response(
-        JSON.stringify(createAuthenticationError(error.message)),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify(createAuthenticationError(error.message)), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Handle not found errors
     if (error instanceof Error && error.name === "NotFoundError") {
-      return new Response(
-        JSON.stringify(createNotFoundError("Card not found or not owned by user")),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify(createNotFoundError("Card not found or not owned by user")), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Handle all other errors
@@ -139,15 +123,15 @@ export async function PATCH(context: APIContext): Promise<Response> {
 
 /**
  * DELETE /api/cards/:id
- * 
+ *
  * Soft-deletes a flashcard for the authenticated user.
- * 
+ *
  * Path Parameters:
  * - id: UUID of the card to delete
- * 
+ *
  * Headers:
  * - Authorization: Bearer <supabase_jwt_token> (required)
- * 
+ *
  * @param context - Astro API context
  * @returns JSON response confirming deletion
  */
@@ -158,13 +142,10 @@ export async function DELETE(context: APIContext): Promise<Response> {
     const idValidation = cardIdSchema.safeParse(cardId);
 
     if (!idValidation.success) {
-      return new Response(
-        JSON.stringify(createValidationError("Invalid card ID format")),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify(createValidationError("Invalid card ID format")), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Step 2: Authenticate user
@@ -187,24 +168,18 @@ export async function DELETE(context: APIContext): Promise<Response> {
   } catch (error) {
     // Handle authentication errors
     if (error instanceof Error && error.name === "AuthenticationError") {
-      return new Response(
-        JSON.stringify(createAuthenticationError(error.message)),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify(createAuthenticationError(error.message)), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Handle not found errors
     if (error instanceof Error && error.name === "NotFoundError") {
-      return new Response(
-        JSON.stringify(createNotFoundError("Card not found or not owned by user")),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify(createNotFoundError("Card not found or not owned by user")), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Handle all other errors

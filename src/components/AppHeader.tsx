@@ -29,7 +29,7 @@ export function AppHeader() {
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-6">
           <h1 className="text-xl font-semibold">Lang Memo</h1>
-          
+
           <nav className="flex items-center gap-1">
             <a
               href="/"
@@ -45,17 +45,10 @@ export function AppHeader() {
             </a>
           </nav>
         </div>
-        
+
         <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">
-            {user.email}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            className="gap-2"
-          >
+          <span className="text-sm text-muted-foreground">{user.email}</span>
+          <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
             <LogOut className="size-4" aria-hidden="true" />
             Sign out
           </Button>

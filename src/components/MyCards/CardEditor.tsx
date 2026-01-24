@@ -38,10 +38,7 @@ export function CardEditor({ front, back, onSave, onCancel }: CardEditorProps) {
   return (
     <div className="space-y-4">
       <div>
-        <label
-          htmlFor="edit-front"
-          className="mb-2 block text-sm font-medium"
-        >
+        <label htmlFor="edit-front" className="mb-2 block text-sm font-medium">
           Front
         </label>
         <textarea
@@ -52,22 +49,14 @@ export function CardEditor({ front, back, onSave, onCancel }: CardEditorProps) {
           placeholder="Enter the front of the card"
           disabled={isSaving}
         />
-        <CharacterCounter
-          current={frontValue.length}
-          limit={FRONT_LIMIT}
-        />
+        <CharacterCounter current={frontValue.length} limit={FRONT_LIMIT} />
         {!isFrontValid && frontValue.trim().length === 0 && (
-          <p className="mt-1 text-xs text-destructive">
-            Front cannot be empty
-          </p>
+          <p className="mt-1 text-xs text-destructive">Front cannot be empty</p>
         )}
       </div>
 
       <div>
-        <label
-          htmlFor="edit-back"
-          className="mb-2 block text-sm font-medium"
-        >
+        <label htmlFor="edit-back" className="mb-2 block text-sm font-medium">
           Back
         </label>
         <textarea
@@ -78,29 +67,17 @@ export function CardEditor({ front, back, onSave, onCancel }: CardEditorProps) {
           placeholder="Enter the back of the card"
           disabled={isSaving}
         />
-        <CharacterCounter
-          current={backValue.length}
-          limit={BACK_LIMIT}
-        />
+        <CharacterCounter current={backValue.length} limit={BACK_LIMIT} />
         {!isBackValid && backValue.trim().length === 0 && (
-          <p className="mt-1 text-xs text-destructive">
-            Back cannot be empty
-          </p>
+          <p className="mt-1 text-xs text-destructive">Back cannot be empty</p>
         )}
       </div>
 
       <div className="flex gap-2">
-        <Button
-          onClick={handleSave}
-          disabled={!isValid || isSaving}
-        >
+        <Button onClick={handleSave} disabled={!isValid || isSaving}>
           {isSaving ? "Saving..." : "Save"}
         </Button>
-        <Button
-          variant="outline"
-          onClick={onCancel}
-          disabled={isSaving}
-        >
+        <Button variant="outline" onClick={onCancel} disabled={isSaving}>
           Cancel
         </Button>
       </div>

@@ -4,7 +4,7 @@
  */
 
 // Simulate Astro's import.meta.env
-// @ts-ignore
+// @ts-expect-error - Simulating Astro's import.meta.env for testing
 globalThis.import = {
   meta: {
     env: {
@@ -29,7 +29,8 @@ async function testServiceInit() {
     // Test direct instantiation
     console.log("\n1. Testing direct OpenRouterService instantiation...");
     const { OpenRouterService } = await import("./src/lib/services/openrouter.service.ts");
-    const service = new OpenRouterService({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _service = new OpenRouterService({
       apiKey,
       defaultModel: "openai/gpt-3.5-turbo",
     });
@@ -38,10 +39,11 @@ async function testServiceInit() {
     // Test factory function (simulating import.meta.env)
     console.log("\n2. Testing createOpenRouterService factory...");
     const { createOpenRouterService } = await import("./src/lib/services/openrouter.service.ts");
-    
+
     // This will fail because import.meta.env isn't properly set up
     try {
-      const service2 = createOpenRouterService();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const _service2 = createOpenRouterService();
       console.log("✅ Factory function successful");
     } catch (error) {
       console.log("⚠️  Factory function failed (expected):", error instanceof Error ? error.message : String(error));

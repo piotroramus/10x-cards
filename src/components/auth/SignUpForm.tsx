@@ -56,17 +56,17 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
 
     // Listen for various events that might indicate autofill
     const inputs = [emailInput, passwordInput, confirmInput];
-    inputs.forEach(input => {
+    inputs.forEach((input) => {
       input.addEventListener("input", syncInputs);
       input.addEventListener("change", syncInputs);
       input.addEventListener("blur", syncInputs);
     });
-    
+
     // Also check periodically (for autofill that doesn't fire events)
     const interval = setInterval(syncInputs, 200);
 
     return () => {
-      inputs.forEach(input => {
+      inputs.forEach((input) => {
         input.removeEventListener("input", syncInputs);
         input.removeEventListener("change", syncInputs);
         input.removeEventListener("blur", syncInputs);
@@ -85,14 +85,14 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
     try {
       // Set email redirect URL for verification email
       const emailRedirectTo = `${window.location.origin}/auth/verify/success`;
-      
+
       const { error: signUpError } = await signUp(email, password, {
         emailRedirectTo,
       });
 
       if (signUpError) {
         const errorMessage = signUpError.message.toLowerCase();
-        
+
         if (
           errorMessage.includes("user already registered") ||
           errorMessage.includes("already registered") ||
@@ -112,7 +112,7 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
         returnUrl ? `&returnUrl=${encodeURIComponent(returnUrl)}` : ""
       }`;
       window.location.href = verifyUrl;
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -123,25 +123,17 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
     <div className="w-full max-w-md space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Sign up</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Create an account to get started
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Create an account to get started</p>
       </div>
 
       {error && (
         <div
-          className={cn(
-            "rounded-md border border-destructive/50 bg-destructive/10 p-4",
-            "dark:bg-destructive/20"
-          )}
+          className={cn("rounded-md border border-destructive/50 bg-destructive/10 p-4", "dark:bg-destructive/20")}
           role="alert"
           aria-live="assertive"
         >
           <div className="flex items-start gap-3">
-            <AlertCircle
-              className="size-5 shrink-0 text-destructive"
-              aria-hidden="true"
-            />
+            <AlertCircle className="size-5 shrink-0 text-destructive" aria-hidden="true" />
             <p className="flex-1 text-sm font-medium text-destructive">{error}</p>
           </div>
         </div>
@@ -162,18 +154,15 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
             className={cn(
               "w-full rounded-md border bg-background px-3 py-2 text-sm",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              !emailValid && email.length > 0 &&
+              !emailValid &&
+                email.length > 0 &&
                 "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
             )}
             aria-invalid={!emailValid && email.length > 0}
             aria-describedby={!emailValid && email.length > 0 ? "signup-email-error" : undefined}
           />
           {!emailValid && email.length > 0 && (
-            <p
-              id="signup-email-error"
-              className="text-xs text-destructive"
-              role="alert"
-            >
+            <p id="signup-email-error" className="text-xs text-destructive" role="alert">
               Please enter a valid email address
             </p>
           )}
@@ -194,18 +183,15 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
             className={cn(
               "w-full rounded-md border bg-background px-3 py-2 text-sm",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              !passwordValid && password.length > 0 &&
+              !passwordValid &&
+                password.length > 0 &&
                 "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
             )}
             aria-invalid={!passwordValid && password.length > 0}
             aria-describedby={!passwordValid && password.length > 0 ? "signup-password-error" : undefined}
           />
           {!passwordValid && password.length > 0 && (
-            <p
-              id="signup-password-error"
-              className="text-xs text-destructive"
-              role="alert"
-            >
+            <p id="signup-password-error" className="text-xs text-destructive" role="alert">
               Password must be at least 8 characters
             </p>
           )}
@@ -225,28 +211,25 @@ export function SignUpForm({ returnUrl }: SignUpFormProps) {
             className={cn(
               "w-full rounded-md border bg-background px-3 py-2 text-sm",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              !passwordConfirmationValid && passwordConfirmation.length > 0 &&
+              !passwordConfirmationValid &&
+                passwordConfirmation.length > 0 &&
                 "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
             )}
             aria-invalid={!passwordConfirmationValid && passwordConfirmation.length > 0}
-            aria-describedby={!passwordConfirmationValid && passwordConfirmation.length > 0 ? "signup-password-confirmation-error" : undefined}
+            aria-describedby={
+              !passwordConfirmationValid && passwordConfirmation.length > 0
+                ? "signup-password-confirmation-error"
+                : undefined
+            }
           />
           {!passwordConfirmationValid && passwordConfirmation.length > 0 && (
-            <p
-              id="signup-password-confirmation-error"
-              className="text-xs text-destructive"
-              role="alert"
-            >
+            <p id="signup-password-confirmation-error" className="text-xs text-destructive" role="alert">
               Passwords do not match
             </p>
           )}
         </div>
 
-        <Button
-          type="submit"
-          disabled={!isValid || loading}
-          className="w-full"
-        >
+        <Button type="submit" disabled={!isValid || loading} className="w-full">
           {loading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
           {loading ? "Creating account..." : "Sign up"}
         </Button>

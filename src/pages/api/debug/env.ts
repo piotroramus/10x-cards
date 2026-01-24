@@ -6,7 +6,8 @@ export const prerender = false;
  * Debug endpoint to check environment variables
  * Only use in development!
  */
-export async function GET(context: APIContext): Promise<Response> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_context: APIContext): Promise<Response> {
   // Only allow in development
   if (import.meta.env.PROD) {
     return new Response("Not available in production", { status: 404 });

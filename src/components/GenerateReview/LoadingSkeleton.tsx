@@ -12,10 +12,7 @@ export function LoadingSkeleton({ count = 3 }: LoadingSkeletonProps) {
   return (
     <div className="space-y-4" aria-label="Loading proposals" aria-live="polite">
       {Array.from({ length: count }).map((_, index) => (
-        <div
-          key={index}
-          className="animate-pulse space-y-4 rounded-md border bg-card p-4"
-        >
+        <div key={index} className="animate-pulse space-y-4 rounded-md border bg-card p-4">
           <div className="space-y-2">
             <div className="h-4 w-3/4 rounded bg-muted" />
             <div className="h-3 w-1/4 rounded bg-muted" />
@@ -33,4 +30,3 @@ export function LoadingSkeleton({ count = 3 }: LoadingSkeletonProps) {
     </div>
   );
 }
-

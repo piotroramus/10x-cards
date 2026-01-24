@@ -16,17 +16,21 @@ if (typeof window !== "undefined") {
       "\n  PUBLIC_SUPABASE_URL=your_supabase_url",
       "\n  PUBLIC_SUPABASE_KEY=your_supabase_anon_key",
       "\n\nCurrent values:",
-      "\n  PUBLIC_SUPABASE_URL:", import.meta.env.PUBLIC_SUPABASE_URL || "NOT SET",
-      "\n  PUBLIC_SUPABASE_KEY:", import.meta.env.PUBLIC_SUPABASE_KEY ? "SET (hidden)" : "NOT SET",
-      "\n  SUPABASE_URL:", import.meta.env.SUPABASE_URL || "NOT SET",
-      "\n  SUPABASE_KEY:", import.meta.env.SUPABASE_KEY ? "SET (hidden)" : "NOT SET",
+      "\n  PUBLIC_SUPABASE_URL:",
+      import.meta.env.PUBLIC_SUPABASE_URL || "NOT SET",
+      "\n  PUBLIC_SUPABASE_KEY:",
+      import.meta.env.PUBLIC_SUPABASE_KEY ? "SET (hidden)" : "NOT SET",
+      "\n  SUPABASE_URL:",
+      import.meta.env.SUPABASE_URL || "NOT SET",
+      "\n  SUPABASE_KEY:",
+      import.meta.env.SUPABASE_KEY ? "SET (hidden)" : "NOT SET"
     );
   }
 }
 
 // Create Supabase browser client using @supabase/ssr for cookie sync
 // Only create if we have the required values and we're in the browser
-let supabase: ReturnType<typeof createBrowserClient<Database>>;
+let supabase: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
 if (typeof window !== "undefined" && supabaseUrl && supabaseAnonKey) {
   supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
@@ -34,9 +38,6 @@ if (typeof window !== "undefined" && supabaseUrl && supabaseAnonKey) {
   // Create a dummy client to prevent crashes, but auth methods will fail
   console.warn("⚠️ Creating dummy Supabase client - auth will not work until env vars are set");
   supabase = createBrowserClient<Database>("https://placeholder.supabase.co", "placeholder-key");
-} else {
-  // SSR: Create a placeholder (won't be used)
-  supabase = null as any;
 }
 
 interface AuthContextValue {
@@ -45,11 +46,7 @@ interface AuthContextValue {
   loading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (
-    email: string,
-    password: string,
-    options?: { emailRedirectTo?: string },
-  ) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, options?: { emailRedirectTo?: string }) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: Error | null }>;
   getToken: () => string | null;
   resendVerificationEmail: (email: string) => Promise<{ error: Error | null }>;
@@ -73,6 +70,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -98,17 +100,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!supabase) {
       return { error: new Error("Supabase client not initialized") };
     }
-    
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
+
       if (error) {
         return { error: new Error(error.message) };
       }
-      
+
       // Session is automatically stored in cookies by createBrowserClient
       return { error: null };
     } catch (error) {
@@ -116,11 +118,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const signUp = async (
-    email: string,
-    password: string,
-    options?: { emailRedirectTo?: string },
-  ) => {
+  const signUp = async (email: string, password: string, options?: { emailRedirectTo?: string }) => {
+    if (!supabase) {
+      return { error: new Error("Supabase client not initialized") };
+    }
+
     try {
       const { error } = await supabase.auth.signUp({
         email,
@@ -136,6 +138,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const signOut = async () => {
+    if (!supabase) {
+      return { error: new Error("Supabase client not initialized") };
+    }
+
     try {
       const { error } = await supabase.auth.signOut();
       return { error: error ? new Error(error.message) : null };
@@ -152,7 +158,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!supabase) {
       return { error: new Error("Supabase client not initialized") };
     }
-    
+
     try {
       const { error } = await supabase.auth.resend({
         type: "signup",
@@ -168,7 +174,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!supabase) {
       return { error: new Error("Supabase client not initialized") };
     }
-    
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo,
@@ -183,7 +189,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!supabase) {
       return { error: new Error("Supabase client not initialized") };
     }
-    
+
     try {
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
@@ -232,13 +238,16 @@ export function useAuth(): AuthContextValue {
 export function getAuthTokenSync(): string | null {
   // This is a synchronous fallback - may not work if session hasn't loaded
   // Prefer using useAuth().getToken() in React components
+  if (!supabase) {
+    return null;
+  }
+
   try {
-    const session = supabase.auth.getSession();
     // getSession returns a promise, so we can't use it synchronously
     // This is a limitation - components should use useAuth hook instead
+    void supabase.auth.getSession();
     return null;
   } catch {
     return null;
   }
 }
-

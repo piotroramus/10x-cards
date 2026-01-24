@@ -17,12 +17,7 @@ interface CharacterCounterProps {
  * - Red: 95-100% of limit
  * - Exceeds limit: Red color + error styling
  */
-export function CharacterCounter({
-  current,
-  max,
-  label,
-  showError = false,
-}: CharacterCounterProps) {
+export function CharacterCounter({ current, max, label, showError = false }: CharacterCounterProps) {
   const percentage = (current / max) * 100;
   const exceedsLimit = current > max;
 
@@ -44,11 +39,7 @@ export function CharacterCounter({
 
   return (
     <div className="flex items-center justify-end gap-1 text-xs">
-      <span
-        className={cn(colorClass, exceedsLimit && "font-medium")}
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <span className={cn(colorClass, exceedsLimit && "font-medium")} aria-live="polite" aria-atomic="true">
         {current} / {max}
       </span>
       {label && (
@@ -59,4 +50,3 @@ export function CharacterCounter({
     </div>
   );
 }
-

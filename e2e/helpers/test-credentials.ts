@@ -9,9 +9,7 @@ export function getTestCredentials() {
   const userId = process.env.E2E_USERNAME_ID;
 
   if (!email || !password) {
-    throw new Error(
-      'E2E test credentials not found. Please set E2E_USERNAME and E2E_PASSWORD in your .env file.'
-    );
+    throw new Error("E2E test credentials not found. Please set E2E_USERNAME and E2E_PASSWORD in your .env file.");
   }
 
   return {

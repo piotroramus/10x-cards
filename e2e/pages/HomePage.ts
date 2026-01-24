@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator } from "@playwright/test";
 
 /**
  * Page Object Model for Home/Generate page
@@ -20,27 +20,27 @@ export class HomePage {
   readonly manualBackCounter: Locator;
 
   constructor(private page: Page) {
-    this.textInput = page.locator('#text-input');
+    this.textInput = page.locator("#text-input");
     // Use aria-label to avoid matching dev tools or other buttons with "Generate" text
-    this.generateButton = page.getByRole('button', { name: 'Generate card proposals' });
+    this.generateButton = page.getByRole("button", { name: "Generate card proposals" });
     // Scope character counter to text input container to avoid matching Front/Back counters
-    this.characterCounter = page.locator('#text-input').locator('..').locator('text=/\\d+ \\/ \\d+/');
+    this.characterCounter = page.locator("#text-input").locator("..").locator("text=/\\d+ \\/ \\d+/");
     this.proposalsList = page.locator('[role="list"][aria-label="Card proposals"]');
-    this.loadingState = page.locator('text=Generating...');
+    this.loadingState = page.locator("text=Generating...");
     this.errorBanner = page.locator('[role="alert"]');
-    
+
     // Manual card form locators
-    this.manualFormToggle = page.locator('button').filter({ hasText: 'Create Card Manually' });
-    this.manualFrontInput = page.locator('#manual-front');
-    this.manualBackInput = page.locator('#manual-back');
-    this.manualSaveButton = page.locator('button[type="submit"]', { hasText: 'Save Card' });
+    this.manualFormToggle = page.locator("button").filter({ hasText: "Create Card Manually" });
+    this.manualFrontInput = page.locator("#manual-front");
+    this.manualBackInput = page.locator("#manual-back");
+    this.manualSaveButton = page.locator('button[type="submit"]', { hasText: "Save Card" });
     // Scope counters to manual form to avoid matching other counters
-    this.manualFrontCounter = page.locator('#manual-front').locator('..').locator('text=/\\d+ \\/ \\d+/').first();
-    this.manualBackCounter = page.locator('#manual-back').locator('..').locator('text=/\\d+ \\/ \\d+/').first();
+    this.manualFrontCounter = page.locator("#manual-front").locator("..").locator("text=/\\d+ \\/ \\d+/").first();
+    this.manualBackCounter = page.locator("#manual-back").locator("..").locator("text=/\\d+ \\/ \\d+/").first();
   }
 
   async goto() {
-    await this.page.goto('/');
+    await this.page.goto("/");
   }
 
   async pasteText(text: string) {
@@ -53,11 +53,11 @@ export class HomePage {
 
   async waitForProposals(timeout = 15000) {
     // Wait for loading state to appear
-    await this.loadingState.waitFor({ state: 'visible', timeout: 5000 });
+    await this.loadingState.waitFor({ state: "visible", timeout: 5000 });
     // Wait for loading state to disappear
-    await this.loadingState.waitFor({ state: 'hidden', timeout });
+    await this.loadingState.waitFor({ state: "hidden", timeout });
     // Wait for proposals to be visible
-    await this.proposalsList.waitFor({ state: 'visible', timeout: 5000 });
+    await this.proposalsList.waitFor({ state: "visible", timeout: 5000 });
   }
 
   async getProposalCount() {
@@ -68,13 +68,13 @@ export class HomePage {
   async acceptFirstProposal() {
     // Find the first proposal and click its Accept button
     const firstProposal = this.page.locator('[role="listitem"]').first();
-    const acceptButton = firstProposal.locator('button', { hasText: 'Accept' });
+    const acceptButton = firstProposal.locator("button", { hasText: "Accept" });
     await acceptButton.click();
   }
 
   async waitForToast(message: string) {
     const toast = this.page.locator('[role="status"]', { hasText: message });
-    await toast.waitFor({ state: 'visible', timeout: 5000 });
+    await toast.waitFor({ state: "visible", timeout: 5000 });
   }
 
   async getCharacterCount() {
@@ -89,12 +89,12 @@ export class HomePage {
 
   // Manual card form methods
   async expandManualForm() {
-    const isExpanded = await this.manualFormToggle.getAttribute('aria-expanded');
-    if (isExpanded === 'false') {
+    const isExpanded = await this.manualFormToggle.getAttribute("aria-expanded");
+    if (isExpanded === "false") {
       await this.manualFormToggle.click();
     }
     // Wait for form to be visible
-    await this.manualFrontInput.waitFor({ state: 'visible', timeout: 2000 });
+    await this.manualFrontInput.waitFor({ state: "visible", timeout: 2000 });
   }
 
   async fillManualCard(front: string, back: string) {
@@ -124,7 +124,7 @@ export class HomePage {
   }
 
   async getManualFrontError() {
-    const error = this.page.locator('#manual-front-error');
+    const error = this.page.locator("#manual-front-error");
     if (await error.isVisible()) {
       return await error.textContent();
     }
@@ -132,7 +132,7 @@ export class HomePage {
   }
 
   async getManualBackError() {
-    const error = this.page.locator('#manual-back-error');
+    const error = this.page.locator("#manual-back-error");
     if (await error.isVisible()) {
       return await error.textContent();
     }

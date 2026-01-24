@@ -1,12 +1,7 @@
 import type { APIContext } from "astro";
 
 import { getAuthenticatedUser } from "../../../lib/auth.ts";
-import {
-  createAuthenticationError,
-  createServerError,
-  createValidationError,
-  handleApiError,
-} from "../../../lib/errors/api-errors.ts";
+import { createAuthenticationError, createValidationError, handleApiError } from "../../../lib/errors/api-errors.ts";
 import { CardService } from "../../../lib/services/card.service.ts";
 import type { CreateCardResponse, ListCardsResponse } from "../../../types.ts";
 import { createCardSchema, listCardsQuerySchema } from "../../../lib/validations/cards.ts";
@@ -16,17 +11,17 @@ export const prerender = false;
 
 /**
  * GET /api/cards
- * 
+ *
  * Lists all active (non-deleted) cards for the authenticated user with pagination.
- * 
+ *
  * Query Parameters:
  * - page: integer >= 1 (default: 1)
  * - limit: integer between 1 and 100 (default: 50)
  * - include_deleted: boolean (default: false)
- * 
+ *
  * Headers:
  * - Authorization: Bearer <supabase_jwt_token> (required)
- * 
+ *
  * @param context - Astro API context
  * @returns JSON response with cards data and pagination metadata
  */
@@ -55,13 +50,10 @@ export async function GET(context: APIContext): Promise<Response> {
         details[path] = err.message;
       });
 
-      return new Response(
-        JSON.stringify(createValidationError("Invalid query parameters", details)),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      return new Response(JSON.stringify(createValidationError("Invalid query parameters", details)), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const { page, limit, include_deleted } = validationResult.data;
@@ -95,13 +87,10 @@ export async function GET(context: APIContext): Promise<Response> {
   } catch (error) {
     // Handle authentication errors
     if (error instanceof Error && error.name === "AuthenticationError") {
-      return new Response(
-        JSON.stringify(createAuthenticationError(error.message)),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      return new Response(JSON.stringify(createAuthenticationError(error.message)), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Handle all other errors
@@ -119,17 +108,17 @@ export async function GET(context: APIContext): Promise<Response> {
 
 /**
  * POST /api/cards
- * 
+ *
  * Creates a new flashcard manually for the authenticated user.
- * 
+ *
  * Request Body:
  * - front: string (required, 1-200 characters)
  * - back: string (required, 1-500 characters)
- * 
+ *
  * Headers:
  * - Authorization: Bearer <supabase_jwt_token> (required)
  * - Content-Type: application/json (required)
- * 
+ *
  * @param context - Astro API context
  * @returns JSON response with created card data
  */
@@ -143,14 +132,11 @@ export async function POST(context: APIContext): Promise<Response> {
     let body: unknown;
     try {
       body = await context.request.json();
-    } catch (error) {
-      return new Response(
-        JSON.stringify(createValidationError("Invalid JSON in request body")),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+    } catch {
+      return new Response(JSON.stringify(createValidationError("Invalid JSON in request body")), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Validate request body using Zod schema
@@ -164,13 +150,10 @@ export async function POST(context: APIContext): Promise<Response> {
         details[path] = err.message;
       });
 
-      return new Response(
-        JSON.stringify(createValidationError("Validation error", details)),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      return new Response(JSON.stringify(createValidationError("Validation error", details)), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const command = validationResult.data;
@@ -189,20 +172,19 @@ export async function POST(context: APIContext): Promise<Response> {
   } catch (error) {
     // Handle authentication errors
     if (error instanceof Error && error.name === "AuthenticationError") {
-      return new Response(
-        JSON.stringify(createAuthenticationError(error.message)),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      return new Response(JSON.stringify(createAuthenticationError(error.message)), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Handle all other errors
     const errorResponse = handleApiError(error, {
       endpoint: "POST /api/cards",
       userId: context.locals.supabase ? "unknown" : undefined,
-    });    return new Response(JSON.stringify(errorResponse), {
+    });
+
+    return new Response(JSON.stringify(errorResponse), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

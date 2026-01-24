@@ -26,9 +26,7 @@ interface AnalyticsProviderProps {
  * Handles offline persistence and fire-and-forget pattern
  * Note: Must be used within AuthProvider to access authentication token
  */
-export function AnalyticsProvider({
-  children,
-}: AnalyticsProviderProps) {
+export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   const { getToken } = useAuth();
   const queueRef = useRef<QueuedEvent[]>([]);
   const intervalRef = useRef<number | null>(null);
@@ -103,7 +101,7 @@ export function AnalyticsProvider({
           const response = await fetch("/api/analytics/events", {
             method: "POST",
             headers: {
-              "Authorization": token,
+              Authorization: token,
               "Content-Type": "application/json",
             },
             body: JSON.stringify(queuedEvent.command),
@@ -116,7 +114,7 @@ export function AnalyticsProvider({
               queueRef.current.push(queuedEvent);
             }
           }
-        } catch (error) {
+        } catch {
           // Network error - re-queue
           if (queuedEvent.timestamp > Date.now() - 3600000) {
             queueRef.current.push(queuedEvent);
@@ -163,14 +161,8 @@ export function AnalyticsProvider({
           const batch = queueRef.current.splice(0, MAX_BATCH_SIZE);
           batch.forEach((queuedEvent) => {
             try {
-              const blob = new Blob(
-                [JSON.stringify(queuedEvent.command)],
-                { type: "application/json" }
-              );
-              navigator.sendBeacon(
-                "/api/analytics/events",
-                blob
-              );
+              const blob = new Blob([JSON.stringify(queuedEvent.command)], { type: "application/json" });
+              navigator.sendBeacon("/api/analytics/events", blob);
             } catch {
               // Ignore sendBeacon errors
             }
@@ -222,4 +214,3 @@ export function useAnalytics(): AnalyticsContextValue {
   }
   return context;
 }
-

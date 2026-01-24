@@ -1,10 +1,10 @@
-import type { ErrorCode, ErrorResponse } from "../../types.ts";
+import type { ErrorResponse } from "../../types.ts";
 
 /**
  * Not found error thrown when a resource is not found or not owned by user
  */
 export class NotFoundError extends Error {
-  constructor(message: string = "Resource not found") {
+  constructor(message = "Resource not found") {
     super(message);
     this.name = "NotFoundError";
   }
@@ -12,14 +12,14 @@ export class NotFoundError extends Error {
 
 /**
  * Creates a validation error response
- * 
+ *
  * @param message - Error message
  * @param details - Optional validation error details (field-specific errors)
  * @returns ErrorResponse object with VALIDATION_ERROR code
  */
 export function createValidationError(
-  message: string = "Invalid request data",
-  details?: Record<string, unknown>,
+  message = "Invalid request data",
+  details?: Record<string, unknown>
 ): ErrorResponse {
   return {
     error: {
@@ -32,13 +32,11 @@ export function createValidationError(
 
 /**
  * Creates an authentication error response
- * 
+ *
  * @param message - Error message
  * @returns ErrorResponse object with AUTHENTICATION_ERROR code
  */
-export function createAuthenticationError(
-  message: string = "Missing or invalid authentication token",
-): ErrorResponse {
+export function createAuthenticationError(message = "Missing or invalid authentication token"): ErrorResponse {
   return {
     error: {
       code: "AUTHENTICATION_ERROR",
@@ -49,13 +47,11 @@ export function createAuthenticationError(
 
 /**
  * Creates a not found error response
- * 
+ *
  * @param message - Error message
  * @returns ErrorResponse object with NOT_FOUND code
  */
-export function createNotFoundError(
-  message: string = "Resource not found",
-): ErrorResponse {
+export function createNotFoundError(message = "Resource not found"): ErrorResponse {
   return {
     error: {
       code: "NOT_FOUND",
@@ -66,13 +62,11 @@ export function createNotFoundError(
 
 /**
  * Creates a server error response
- * 
+ *
  * @param message - Error message (should be generic for security)
  * @returns ErrorResponse object with SERVER_ERROR code
  */
-export function createServerError(
-  message: string = "An internal server error occurred",
-): ErrorResponse {
+export function createServerError(message = "An internal server error occurred"): ErrorResponse {
   return {
     error: {
       code: "SERVER_ERROR",
@@ -83,13 +77,11 @@ export function createServerError(
 
 /**
  * Creates a quota exceeded error response
- * 
+ *
  * @param message - Error message
  * @returns ErrorResponse object with QUOTA_EXCEEDED code
  */
-export function createQuotaExceededError(
-  message: string = "Quota exceeded",
-): ErrorResponse {
+export function createQuotaExceededError(message = "Quota exceeded"): ErrorResponse {
   return {
     error: {
       code: "QUOTA_EXCEEDED",
@@ -100,18 +92,15 @@ export function createQuotaExceededError(
 
 /**
  * Handles API errors and returns appropriate error response
- * 
+ *
  * This function provides a centralized way to handle different types of errors
  * and convert them to the standard ErrorResponse format.
- * 
+ *
  * @param error - The error to handle (can be Error, string, or unknown)
  * @param context - Optional context information for logging
  * @returns ErrorResponse object with appropriate error code
  */
-export function handleApiError(
-  error: unknown,
-  context?: { endpoint?: string; userId?: string },
-): ErrorResponse {
+export function handleApiError(error: unknown, context?: { endpoint?: string; userId?: string }): ErrorResponse {
   // Handle known error types
   if (error instanceof Error) {
     // Check for AuthenticationError (from auth.ts)
@@ -150,4 +139,3 @@ export function handleApiError(
   }
   return createServerError();
 }
-

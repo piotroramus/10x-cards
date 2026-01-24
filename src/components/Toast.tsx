@@ -36,11 +36,7 @@ function ToastItem({ toast: t }: { toast: Toast }) {
     toast.dismiss(t.id);
   };
 
-  const Icon = t.type === "success"
-    ? CheckCircle2
-    : t.type === "error"
-      ? AlertCircle
-      : Info;
+  const Icon = t.type === "success" ? CheckCircle2 : t.type === "error" ? AlertCircle : Info;
 
   return (
     <div

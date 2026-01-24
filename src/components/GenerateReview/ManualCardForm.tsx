@@ -15,11 +15,7 @@ interface ManualCardFormProps {
  * ManualCardForm component for manual card creation
  * Includes front/back input fields, character counters, and Save button
  */
-export function ManualCardForm({
-  onCreate,
-  saving = false,
-  collapsed: initialCollapsed = false,
-}: ManualCardFormProps) {
+export function ManualCardForm({ onCreate, saving = false, collapsed: initialCollapsed = false }: ManualCardFormProps) {
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
@@ -75,11 +71,7 @@ export function ManualCardForm({
         )}
       </button>
       {!collapsed && (
-        <form
-          id="manual-card-form-content"
-          onSubmit={handleSubmit}
-          className="space-y-4 p-4 pt-0"
-        >
+        <form id="manual-card-form-content" onSubmit={handleSubmit} className="space-y-4 p-4 pt-0">
           <div className="space-y-2">
             <label htmlFor="manual-front" className="text-sm font-medium">
               Front
@@ -93,7 +85,8 @@ export function ManualCardForm({
               className={cn(
                 "w-full rounded-md border bg-background px-3 py-2 text-sm",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                !frontValid && "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
+                !frontValid &&
+                  "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
               )}
               aria-invalid={!frontValid}
               aria-describedby="manual-front-error"
@@ -106,14 +99,8 @@ export function ManualCardForm({
                 showError={front.length > FRONT_MAX}
               />
               {(front.length === 0 || front.length > FRONT_MAX) && (
-                <p
-                  id="manual-front-error"
-                  className="text-xs text-destructive ml-2"
-                  role="alert"
-                >
-                  {front.length === 0
-                    ? "Front is required"
-                    : `Front must be ${FRONT_MAX} characters or less`}
+                <p id="manual-front-error" className="text-xs text-destructive ml-2" role="alert">
+                  {front.length === 0 ? "Front is required" : `Front must be ${FRONT_MAX} characters or less`}
                 </p>
               )}
             </div>
@@ -133,7 +120,8 @@ export function ManualCardForm({
                 "w-full rounded-md border bg-background px-3 py-2 text-sm",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 "resize-y",
-                !backValid && "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
+                !backValid &&
+                  "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
               )}
               aria-invalid={!backValid}
               aria-describedby="manual-back-error"
@@ -146,24 +134,14 @@ export function ManualCardForm({
                 showError={back.length > BACK_MAX}
               />
               {(back.length === 0 || back.length > BACK_MAX) && (
-                <p
-                  id="manual-back-error"
-                  className="text-xs text-destructive ml-2"
-                  role="alert"
-                >
-                  {back.length === 0
-                    ? "Back is required"
-                    : `Back must be ${BACK_MAX} characters or less`}
+                <p id="manual-back-error" className="text-xs text-destructive ml-2" role="alert">
+                  {back.length === 0 ? "Back is required" : `Back must be ${BACK_MAX} characters or less`}
                 </p>
               )}
             </div>
           </div>
 
-          <Button
-            type="submit"
-            disabled={!isValid || saving}
-            className="w-full"
-          >
+          <Button type="submit" disabled={!isValid || saving} className="w-full">
             {saving ? "Saving..." : "Save Card"}
           </Button>
         </form>
@@ -171,4 +149,3 @@ export function ManualCardForm({
     </div>
   );
 }
-

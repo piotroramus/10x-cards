@@ -67,10 +67,8 @@ export function CardProposalEditor({
   };
 
   return (
-    <div
-      className="space-y-4 rounded-md border bg-card p-4"
-      onKeyDown={handleKeyDown}
-    >
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex
+    <section className="space-y-4 rounded-md border bg-card p-4" onKeyDown={handleKeyDown} role="group" tabIndex={0}>
       <div className="space-y-2">
         <label htmlFor={`proposal-front-${proposal.id}`} className="text-sm font-medium">
           Front
@@ -97,14 +95,8 @@ export function CardProposalEditor({
             showError={front.length > FRONT_MAX}
           />
           {(front.length === 0 || front.length > FRONT_MAX) && (
-            <p
-              id={`proposal-front-error-${proposal.id}`}
-              className="text-xs text-destructive ml-2"
-              role="alert"
-            >
-              {front.length === 0
-                ? "Front is required"
-                : `Front must be ${FRONT_MAX} characters or less`}
+            <p id={`proposal-front-error-${proposal.id}`} className="text-xs text-destructive ml-2" role="alert">
+              {front.length === 0 ? "Front is required" : `Front must be ${FRONT_MAX} characters or less`}
             </p>
           )}
         </div>
@@ -137,38 +129,21 @@ export function CardProposalEditor({
             showError={back.length > BACK_MAX}
           />
           {(back.length === 0 || back.length > BACK_MAX) && (
-            <p
-              id={`proposal-back-error-${proposal.id}`}
-              className="text-xs text-destructive ml-2"
-              role="alert"
-            >
-              {back.length === 0
-                ? "Back is required"
-                : `Back must be ${BACK_MAX} characters or less`}
+            <p id={`proposal-back-error-${proposal.id}`} className="text-xs text-destructive ml-2" role="alert">
+              {back.length === 0 ? "Back is required" : `Back must be ${BACK_MAX} characters or less`}
             </p>
           )}
         </div>
       </div>
 
       <div className="flex gap-2">
-        <Button
-          onClick={handleAccept}
-          disabled={!isValid || accepting}
-          className="flex-1"
-          variant="default"
-        >
+        <Button onClick={handleAccept} disabled={!isValid || accepting} className="flex-1" variant="default">
           {accepting ? "Saving..." : "Accept"}
         </Button>
-        <Button
-          onClick={handleReject}
-          disabled={accepting}
-          variant="outline"
-          className="flex-1"
-        >
+        <Button onClick={handleReject} disabled={accepting} variant="outline" className="flex-1">
           Reject
         </Button>
       </div>
-    </div>
+    </section>
   );
 }
-

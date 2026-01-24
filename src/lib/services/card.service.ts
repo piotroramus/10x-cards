@@ -2,7 +2,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "../../db/database.types.ts";
 import type { CardDTO, CreateCardCommand, AcceptProposalCommand, UpdateCardCommand } from "../../types.ts";
-import type { ListCardsQueryParams } from "../validations/cards.ts";
 import { AnalyticsService } from "./analytics.service.ts";
 import { NotFoundError } from "../errors/api-errors.ts";
 
@@ -31,16 +30,13 @@ export class CardService {
 
   /**
    * Lists cards for a user with pagination
-   * 
+   *
    * @param userId - The authenticated user's ID
    * @param options - Pagination and filtering options
    * @returns Promise resolving to cards data and total count
    * @throws Error if database query fails
    */
-  async listCards(
-    userId: string,
-    options: ListCardsOptions,
-  ): Promise<ListCardsResult> {
+  async listCards(userId: string, options: ListCardsOptions): Promise<ListCardsResult> {
     const { page, limit, includeDeleted } = options;
 
     // Build the base query
@@ -58,7 +54,7 @@ export class CardService {
     // Apply pagination
     const from = (page - 1) * limit;
     const to = from + limit - 1;
-    
+
     let data, count, error;
     try {
       const result = await query.range(from, to);
@@ -70,7 +66,7 @@ export class CardService {
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
       throw new Error(
         `Failed to connect to database: ${errorMessage}. ` +
-        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+          `Please ensure Supabase is running and SUPABASE_URL is correct.`
       );
     }
 
@@ -96,7 +92,7 @@ export class CardService {
 
   /**
    * Creates a new card for a user
-   * 
+   *
    * @param command - The card creation command (front and back)
    * @param userId - The authenticated user's ID
    * @returns Promise resolving to the created card DTO
@@ -123,7 +119,7 @@ export class CardService {
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
       throw new Error(
         `Failed to connect to database: ${errorMessage}. ` +
-        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+          `Please ensure Supabase is running and SUPABASE_URL is correct.`
       );
     }
 
@@ -156,7 +152,7 @@ export class CardService {
 
   /**
    * Accepts an AI-generated proposal and persists it as a card
-   * 
+   *
    * @param command - The accept proposal command (front and back)
    * @param userId - The authenticated user's ID
    * @returns Promise resolving to the created card DTO
@@ -183,7 +179,7 @@ export class CardService {
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
       throw new Error(
         `Failed to connect to database: ${errorMessage}. ` +
-        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+          `Please ensure Supabase is running and SUPABASE_URL is correct.`
       );
     }
 
@@ -216,7 +212,7 @@ export class CardService {
 
   /**
    * Updates an existing card
-   * 
+   *
    * @param cardId - The card ID to update
    * @param command - The update card command (partial front and/or back)
    * @param userId - The authenticated user's ID
@@ -224,11 +220,7 @@ export class CardService {
    * @throws NotFoundError if card not found or not owned by user
    * @throws Error if database update fails
    */
-  async updateCard(
-    cardId: string,
-    command: UpdateCardCommand,
-    userId: string
-  ): Promise<CardDTO> {
+  async updateCard(cardId: string, command: UpdateCardCommand, userId: string): Promise<CardDTO> {
     // Build the update object (only include provided fields)
     const updateData: Record<string, string> = {};
     if (command.front !== undefined) {
@@ -256,7 +248,7 @@ export class CardService {
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
       throw new Error(
         `Failed to connect to database: ${errorMessage}. ` +
-        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+          `Please ensure Supabase is running and SUPABASE_URL is correct.`
       );
     }
 
@@ -287,7 +279,7 @@ export class CardService {
 
   /**
    * Soft-deletes a card by setting deleted_at timestamp
-   * 
+   *
    * @param cardId - The card ID to delete
    * @param userId - The authenticated user's ID
    * @returns Promise resolving when deletion is complete
@@ -307,7 +299,7 @@ export class CardService {
         .select("id")
         .single();
       error = result.error;
-      
+
       // Check if no rows were updated (card doesn't exist or not owned by user)
       if (!result.data) {
         throw new NotFoundError("Card not found or not owned by user");
@@ -317,12 +309,12 @@ export class CardService {
       if (fetchError instanceof NotFoundError) {
         throw fetchError;
       }
-      
+
       // Handle network/connection errors
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
       throw new Error(
         `Failed to connect to database: ${errorMessage}. ` +
-        `Please ensure Supabase is running and SUPABASE_URL is correct.`
+          `Please ensure Supabase is running and SUPABASE_URL is correct.`
       );
     }
 
@@ -335,4 +327,3 @@ export class CardService {
     }
   }
 }
-

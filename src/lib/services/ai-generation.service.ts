@@ -42,19 +42,16 @@ export class AIGenerationService {
 
   /**
    * Generates flashcard proposals from text using AI
-   * 
+   *
    * Handles retries for invalid JSON (up to 2 retries), validates response schema,
    * filters invalid proposals (exceeding character limits), and creates analytics event.
-   * 
+   *
    * @param text - Source text to generate flashcards from (validated, max 10,000 chars)
    * @param userId - Authenticated user's ID
    * @returns Promise resolving to proposals array and count
    * @throws Error for various failure scenarios (quota, invalid JSON, network, etc.)
    */
-  async generateProposals(
-    text: string,
-    userId: string,
-  ): Promise<{ proposals: CardProposal[]; count: number }> {
+  async generateProposals(text: string, userId: string): Promise<{ proposals: CardProposal[]; count: number }> {
     const maxRetries = 2;
     let lastError: Error | null = null;
 
@@ -109,7 +106,7 @@ export class AIGenerationService {
           // If JSON parsing fails, treat as invalid JSON and retry
           if (attempt < maxRetries) {
             lastError = new InvalidJsonError(
-              `Failed to parse AI response as JSON: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+              `Failed to parse AI response as JSON: ${parseError instanceof Error ? parseError.message : String(parseError)}`
             );
             continue;
           }

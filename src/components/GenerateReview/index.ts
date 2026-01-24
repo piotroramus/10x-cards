@@ -9,4 +9,3 @@ export { ProposalList } from "./ProposalList";
 export { ManualCardForm } from "./ManualCardForm";
 export { GenerateReviewContainer } from "./GenerateReviewContainer";
 export { GenerateReviewView } from "./GenerateReviewView";
-

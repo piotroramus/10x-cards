@@ -1,6 +1,6 @@
-import { expect, afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
-import * as matchers from '@testing-library/jest-dom/matchers';
+import { expect, afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import * as matchers from "@testing-library/jest-dom/matchers";
 
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
@@ -11,8 +11,8 @@ afterEach(() => {
 });
 
 // Mock environment variables for tests
-process.env.PUBLIC_SUPABASE_URL = 'http://localhost:54321';
-process.env.PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+process.env.PUBLIC_SUPABASE_URL = "http://localhost:54321";
+process.env.PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
 // Mock global objects if needed
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -22,7 +22,7 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
     matches: false,

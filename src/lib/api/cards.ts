@@ -6,7 +6,6 @@ import type {
   CreateCardCommand,
   CreateCardResponse,
   ErrorResponse,
-  CardProposal,
 } from "@/types";
 
 /**
@@ -64,7 +63,7 @@ export async function generateProposals(
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
-  
+
   // Add Authorization header if token is provided
   if (token) {
     headers.Authorization = token;
@@ -97,7 +96,7 @@ export async function acceptProposal(
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
-  
+
   if (token) {
     headers.Authorization = token;
   }
@@ -122,14 +121,11 @@ export async function acceptProposal(
  * @returns Promise resolving to created card response
  * @throws ApiError if request fails
  */
-export async function createCard(
-  command: CreateCardCommand,
-  token: string | null
-): Promise<CreateCardResponse> {
+export async function createCard(command: CreateCardCommand, token: string | null): Promise<CreateCardResponse> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
-  
+
   if (token) {
     headers.Authorization = token;
   }
@@ -207,4 +203,3 @@ export function mapErrorToBannerState(error: ApiError): {
     retryable: true,
   };
 }
-

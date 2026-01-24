@@ -7,7 +7,7 @@ import type { Database } from "../db/database.types.ts";
  * Authentication error thrown when JWT token is missing or invalid
  */
 export class AuthenticationError extends Error {
-  constructor(message: string = "Missing or invalid authentication token") {
+  constructor(message = "Missing or invalid authentication token") {
     super(message);
     this.name = "AuthenticationError";
   }
@@ -15,14 +15,14 @@ export class AuthenticationError extends Error {
 
 /**
  * Extracts and validates the authenticated user from the request.
- * 
+ *
  * Uses the Supabase instance from context.locals which is configured with cookie-based auth.
  * Falls back to Authorization header if cookies are not available (for backward compatibility).
- * 
+ *
  * @param context - Astro API context containing request headers and locals
  * @returns Object containing the authenticated user with id
  * @throws {AuthenticationError} If token is missing, invalid, or expired
- * 
+ *
  * @example
  * ```typescript
  * const { user } = await getAuthenticatedUser(context);
@@ -32,12 +32,15 @@ export class AuthenticationError extends Error {
 export async function getAuthenticatedUser(context: APIContext) {
   // First, try to use Supabase instance from locals (cookie-based auth)
   if (context.locals.supabase) {
-    const { data: { user }, error } = await context.locals.supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error,
+    } = await context.locals.supabase.auth.getUser();
+
     if (error || !user) {
       throw new AuthenticationError("Invalid or expired authentication token");
     }
-    
+
     return { user };
   }
 
@@ -61,7 +64,7 @@ export async function getAuthenticatedUser(context: APIContext) {
   // Fall back to non-prefixed for backward compatibility
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY || import.meta.env.SUPABASE_KEY;
-  
+
   const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     global: {
       headers: {
@@ -71,7 +74,10 @@ export async function getAuthenticatedUser(context: APIContext) {
   });
 
   // Validate token and get user
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
     throw new AuthenticationError("Invalid or expired authentication token");
@@ -79,4 +85,3 @@ export async function getAuthenticatedUser(context: APIContext) {
 
   return { user };
 }
-

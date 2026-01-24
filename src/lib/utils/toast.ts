@@ -16,7 +16,7 @@ type ToastListener = (toasts: Toast[]) => void;
 
 class ToastManager {
   private toasts: Toast[] = [];
-  private listeners: Set<ToastListener> = new Set();
+  private listeners = new Set<ToastListener>();
 
   subscribe(listener: ToastListener) {
     this.listeners.add(listener);
@@ -64,4 +64,3 @@ class ToastManager {
 }
 
 export const toast = new ToastManager();
-

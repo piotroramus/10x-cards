@@ -23,19 +23,16 @@ const email = Astro.url.searchParams.get("email") || "";
         </div>
       </div>
 
-      {email && (
-        <div class="space-y-4">
-          <ResendVerificationView client:load email={email} />
-        </div>
-      )}
+      {
+        email && (
+          <div class="space-y-4">
+            <ResendVerificationView client:load email={email} />
+          </div>
+        )
+      }
 
       <div class="text-center">
-        <a
-          href="/auth/sign-in"
-          class="text-sm text-primary hover:underline"
-        >
-          Back to sign in
-        </a>
+        <a href="/auth/sign-in" class="text-sm text-primary hover:underline"> Back to sign in </a>
       </div>
     </div>
   </AuthLayout>

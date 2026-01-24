@@ -13,12 +13,7 @@ interface GenerateButtonProps {
  * GenerateButton component for triggering AI proposal generation
  * Displays loading state during generation and disabled state when input is invalid
  */
-export function GenerateButton({
-  onClick,
-  disabled,
-  loading,
-  disabledMessage,
-}: GenerateButtonProps) {
+export function GenerateButton({ onClick, disabled, loading, disabledMessage }: GenerateButtonProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key === "Enter" && !disabled && !loading) {
       onClick();
@@ -52,4 +47,3 @@ export function GenerateButton({
     </div>
   );
 }
-

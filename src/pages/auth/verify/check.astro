@@ -31,7 +31,7 @@ if (!email) {
 
       <div class="space-y-4">
         <ResendVerificationView client:load email={email} />
-        
+
         <div class="text-center">
           <a
             href={`/auth/sign-in${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ""}`}

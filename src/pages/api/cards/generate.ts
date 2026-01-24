@@ -43,14 +43,11 @@ export async function POST(context: APIContext): Promise<Response> {
     let body: unknown;
     try {
       body = await context.request.json();
-    } catch (error) {
-      return new Response(
-        JSON.stringify(createValidationError("Invalid JSON in request body")),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+    } catch {
+      return new Response(JSON.stringify(createValidationError("Invalid JSON in request body")), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Validate request body using Zod schema
@@ -64,13 +61,10 @@ export async function POST(context: APIContext): Promise<Response> {
         details[path] = err.message;
       });
 
-      return new Response(
-        JSON.stringify(createValidationError("Validation error", details)),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      return new Response(JSON.stringify(createValidationError("Validation error", details)), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const { text } = validationResult.data;
@@ -82,13 +76,10 @@ export async function POST(context: APIContext): Promise<Response> {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (errorMessage.includes("OPENROUTER_API_KEY")) {
-        return new Response(
-          JSON.stringify(createServerError("OpenRouter API key is not configured")),
-          {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return new Response(JSON.stringify(createServerError("OpenRouter API key is not configured")), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
       }
       throw error; // Re-throw if it's a different error
     }
@@ -103,36 +94,28 @@ export async function POST(context: APIContext): Promise<Response> {
 
       // Quota exceeded (402 Payment Required)
       if (errorMessage.includes("QUOTA_EXCEEDED")) {
-        return new Response(
-          JSON.stringify(createQuotaExceededError("OpenRouter quota or rate limit exceeded")),
-          {
-            status: 402,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return new Response(JSON.stringify(createQuotaExceededError("OpenRouter quota or rate limit exceeded")), {
+          status: 402,
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
       // Rate limit (429 Too Many Requests)
       if (errorMessage.includes("Rate limit")) {
-        return new Response(
-          JSON.stringify(createQuotaExceededError("Rate limit exceeded. Please try again later")),
-          {
-            status: 429,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return new Response(JSON.stringify(createQuotaExceededError("Rate limit exceeded. Please try again later")), {
+          status: 429,
+          headers: { "Content-Type": "application/json" },
+        });
       }
 
       // Invalid JSON (422 Unprocessable Entity)
       if (errorMessage.includes("INVALID_JSON")) {
         return new Response(
-          JSON.stringify(
-            createValidationError("AI model returned invalid proposals. Please try again."),
-          ),
+          JSON.stringify(createValidationError("AI model returned invalid proposals. Please try again.")),
           {
             status: 422,
             headers: { "Content-Type": "application/json" },
-          },
+          }
         );
       }
 
@@ -142,15 +125,13 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response(
           JSON.stringify(
             createServerError(
-              status === 503
-                ? "AI service temporarily unavailable"
-                : "An internal server error occurred",
-            ),
+              status === 503 ? "AI service temporarily unavailable" : "An internal server error occurred"
+            )
           ),
           {
             status,
             headers: { "Content-Type": "application/json" },
-          },
+          }
         );
       }
 
@@ -166,13 +147,10 @@ export async function POST(context: APIContext): Promise<Response> {
   } catch (error) {
     // Handle authentication errors
     if (error instanceof Error && error.name === "AuthenticationError") {
-      return new Response(
-        JSON.stringify(createAuthenticationError(error.message)),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      return new Response(JSON.stringify(createAuthenticationError(error.message)), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Handle all other errors

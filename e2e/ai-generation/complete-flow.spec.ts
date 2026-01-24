@@ -1,15 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { SignInPage } from '../pages/SignInPage';
-import { HomePage } from '../pages/HomePage';
-import { CardsPage } from '../pages/CardsPage';
-import { getTestCredentials } from '../helpers/test-credentials';
+import { test, expect } from "@playwright/test";
+import { SignInPage } from "../pages/SignInPage";
+import { HomePage } from "../pages/HomePage";
+import { CardsPage } from "../pages/CardsPage";
+import { getTestCredentials } from "../helpers/test-credentials";
 
 /**
  * E2E-001: Complete AI Generation Flow
  * Priority: Critical
  * Tests the main happy path of generating AI proposals and accepting one
  */
-test.describe('Complete AI Generation Flow', () => {
+test.describe("Complete AI Generation Flow", () => {
   let signInPage: SignInPage;
   let homePage: HomePage;
   let cardsPage: CardsPage;
@@ -23,16 +23,16 @@ test.describe('Complete AI Generation Flow', () => {
     cardsPage = new CardsPage(page);
   });
 
-  test.skip('should complete full AI generation and acceptance flow', async ({ page }) => {
+  test.skip("should complete full AI generation and acceptance flow", async ({ page }) => {
     const credentials = getTestCredentials();
-    
+
     // Step 1: Sign in with test credentials
     await signInPage.goto();
     await signInPage.signIn(credentials.email, credentials.password);
-    
+
     // Wait for successful authentication and redirect to home
-    await page.waitForURL('/', { timeout: 10000 });
-    
+    await page.waitForURL("/", { timeout: 10000 });
+
     // Step 2: Verify we're on the home page
     await expect(homePage.textInput).toBeVisible();
     await expect(homePage.generateButton).toBeVisible();
@@ -87,29 +87,33 @@ test.describe('Complete AI Generation Flow', () => {
 
     // Step 13: Verify card has AI origin badge
     const firstCardBadge = await cardsPage.getCardOriginBadge(0);
-    expect(firstCardBadge).toBe('AI');
+    expect(firstCardBadge).toBe("AI");
 
     // Step 14: Verify card content exists and is reasonable
     const firstCardFront = await cardsPage.getCardFrontText(0);
     expect(firstCardFront).toBeTruthy();
-    expect(firstCardFront!.length).toBeGreaterThan(0);
-    expect(firstCardFront!.length).toBeLessThanOrEqual(200);
+    if (firstCardFront) {
+      expect(firstCardFront.length).toBeGreaterThan(0);
+      expect(firstCardFront.length).toBeLessThanOrEqual(200);
+    }
 
     // Expand and check back text
     await cardsPage.expandCard(0);
     const firstCardBack = await cardsPage.getCardBackText(0);
     expect(firstCardBack).toBeTruthy();
-    expect(firstCardBack!.length).toBeGreaterThan(0);
-    expect(firstCardBack!.length).toBeLessThanOrEqual(500);
+    if (firstCardBack) {
+      expect(firstCardBack.length).toBeGreaterThan(0);
+      expect(firstCardBack.length).toBeLessThanOrEqual(500);
+    }
   });
 
-  test('should preserve proposals when navigating away and back', async ({ page }) => {
+  test("should preserve proposals when navigating away and back", async ({ page }) => {
     const credentials = getTestCredentials();
-    
+
     // Sign in
     await signInPage.goto();
     await signInPage.signIn(credentials.email, credentials.password);
-    await page.waitForURL('/', { timeout: 10000 });
+    await page.waitForURL("/", { timeout: 10000 });
 
     // Generate proposals
     await homePage.pasteText(sampleText);
@@ -123,42 +127,48 @@ test.describe('Complete AI Generation Flow', () => {
     await cardsPage.goto();
     await page.goBack();
 
+    // Wait for navigation to complete and page to load
+    await page.waitForURL("/", { timeout: 10000 });
+
+    // Wait for proposals to be restored from localStorage
+    await homePage.proposalsList.waitFor({ state: "visible", timeout: 5000 });
+
     // Verify proposals are still visible (client-side state preservation)
     const proposalCountAfterNavigation = await homePage.getProposalCount();
     expect(proposalCountAfterNavigation).toBe(initialProposalCount);
   });
 
-  test('should handle character counter edge cases', async ({ page }) => {
+  test("should handle character counter edge cases", async ({ page }) => {
     const credentials = getTestCredentials();
-    
+
     // Sign in
     await signInPage.goto();
     await signInPage.signIn(credentials.email, credentials.password);
-    await page.waitForURL('/', { timeout: 10000 });
+    await page.waitForURL("/", { timeout: 10000 });
 
     // Test empty input
-    await homePage.pasteText('');
+    await homePage.pasteText("");
     let charCount = await homePage.getCharacterCount();
     expect(charCount).toBe(0);
 
     // Test short input
-    const shortText = 'Short text';
+    const shortText = "Short text";
     await homePage.pasteText(shortText);
     charCount = await homePage.getCharacterCount();
     expect(charCount).toBe(shortText.length);
 
     // Test near-limit input (9,900 characters)
-    const nearLimitText = 'a'.repeat(9900);
+    const nearLimitText = "a".repeat(9900);
     await homePage.pasteText(nearLimitText);
     charCount = await homePage.getCharacterCount();
     expect(charCount).toBe(9900);
 
     // Test exact limit (10,000 characters)
-    const exactLimitText = 'a'.repeat(10000);
+    const exactLimitText = "a".repeat(10000);
     await homePage.pasteText(exactLimitText);
     charCount = await homePage.getCharacterCount();
     expect(charCount).toBe(10000);
-    
+
     // Button should still be enabled at exactly 10,000
     const isDisabled = await homePage.isGenerateButtonDisabled();
     expect(isDisabled).toBe(false);

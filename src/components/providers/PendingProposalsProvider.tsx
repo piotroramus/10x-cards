@@ -35,7 +35,7 @@ function loadFromStorage(): PendingProposalViewModel[] {
     }
 
     const parsed = JSON.parse(stored) as CardProposal[];
-    
+
     // Validate and convert to ViewModels with temporary IDs
     return parsed.map((proposal) => ({
       ...proposal,
@@ -96,9 +96,10 @@ export function PendingProposalsProvider({ children }: PendingProposalsProviderP
   // Sync to localStorage whenever proposals change (after hydration)
   useEffect(() => {
     if (!isHydrated) return;
-    
+
     // Convert ViewModels back to CardProposals for storage (remove temporary IDs)
-    const proposalsToStore: CardProposal[] = proposals.map(({ id, ...proposal }) => proposal);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const proposalsToStore: CardProposal[] = proposals.map(({ id: _id, ...proposal }) => proposal);
     saveToStorage(proposalsToStore);
   }, [proposals, isHydrated]);
 
@@ -114,9 +115,7 @@ export function PendingProposalsProvider({ children }: PendingProposalsProviderP
   }, []);
 
   const updateProposal = useCallback((id: string, proposal: CardProposal) => {
-    setProposals((prev) =>
-      prev.map((p) => (p.id === id ? { ...proposal, id } : p))
-    );
+    setProposals((prev) => prev.map((p) => (p.id === id ? { ...proposal, id } : p)));
   }, []);
 
   const removeProposal = useCallback((id: string) => {
@@ -143,11 +142,7 @@ export function PendingProposalsProvider({ children }: PendingProposalsProviderP
     clearAll,
   };
 
-  return (
-    <PendingProposalsContext.Provider value={value}>
-      {children}
-    </PendingProposalsContext.Provider>
-  );
+  return <PendingProposalsContext.Provider value={value}>{children}</PendingProposalsContext.Provider>;
 }
 
 /**
@@ -161,4 +156,3 @@ export function usePendingProposals(): PendingProposalsContextValue {
   }
   return context;
 }
-

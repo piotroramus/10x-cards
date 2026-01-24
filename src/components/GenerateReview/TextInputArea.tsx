@@ -31,7 +31,7 @@ export function TextInputArea({
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  const handlePaste = () => {
     // Allow paste, but onChange will handle length validation
     // Additional sanitization can be added here if needed
   };
@@ -60,8 +60,7 @@ export function TextInputArea({
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "resize-y",
-            hasError &&
-              "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
+            hasError && "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
           )}
           aria-invalid={hasError}
           aria-describedby={error ? "text-input-error" : undefined}
@@ -76,11 +75,7 @@ export function TextInputArea({
         </div>
       </div>
       {error && (
-        <p
-          id="text-input-error"
-          className="text-sm text-destructive"
-          role="alert"
-        >
+        <p id="text-input-error" className="text-sm text-destructive" role="alert">
           {error}
         </p>
       )}
@@ -92,4 +87,3 @@ export function TextInputArea({
     </div>
   );
 }
-

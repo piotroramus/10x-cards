@@ -607,7 +607,6 @@ export class OpenRouterService {
     const decoder = new TextDecoder();
     let buffer = "";
     let model: string | undefined;
-    let accumulatedContent = "";
 
     try {
       while (true) {
@@ -666,8 +665,6 @@ export class OpenRouterService {
                 if (delta && typeof delta === "object") {
                   const deltaContent = delta.content;
                   if (typeof deltaContent === "string") {
-                    accumulatedContent += deltaContent;
-
                     // Yield chunk
                     const chunk: ChatStreamChunk = {
                       delta: deltaContent,

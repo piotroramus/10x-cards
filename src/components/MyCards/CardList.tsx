@@ -15,34 +15,18 @@ interface CardListProps {
 /**
  * CardList component displays a paginated list of cards
  */
-export function CardList({
-  cards,
-  onDelete,
-  onUpdate,
-  currentPage,
-  totalPages,
-  onPageChange,
-}: CardListProps) {
+export function CardList({ cards, onDelete, onUpdate, currentPage, totalPages, onPageChange }: CardListProps) {
   return (
     <div>
       <div className="space-y-4">
         {cards.map((card) => (
-          <CardItem
-            key={card.id}
-            card={card}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-          />
+          <CardItem key={card.id} card={card} onDelete={onDelete} onUpdate={onUpdate} />
         ))}
       </div>
 
       {totalPages > 1 && (
         <div className="mt-8">
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
+          <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
         </div>
       )}
     </div>
