@@ -19,6 +19,7 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const FRONT_MAX = 200;
   const BACK_MAX = 500;
@@ -43,10 +44,12 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setAttemptedSubmit(true);
     if (isValid) {
       onCreate({ front, back });
       setFront("");
       setBack("");
+      setAttemptedSubmit(false);
     }
   };
 
@@ -85,11 +88,12 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
               className={cn(
                 "w-full rounded-md border bg-background px-3 py-2 text-sm",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                !frontValid &&
+                attemptedSubmit &&
+                  !frontValid &&
                   "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
               )}
-              aria-invalid={!frontValid}
-              aria-describedby="manual-front-error"
+              aria-invalid={attemptedSubmit && !frontValid}
+              aria-describedby={attemptedSubmit && !frontValid ? "manual-front-error" : undefined}
             />
             <div className="flex items-center justify-between">
               <CharacterCounter
@@ -98,7 +102,7 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
                 label="Front text character count"
                 showError={front.length > FRONT_MAX}
               />
-              {(front.length === 0 || front.length > FRONT_MAX) && (
+              {attemptedSubmit && (front.length === 0 || front.length > FRONT_MAX) && (
                 <p id="manual-front-error" className="text-xs text-destructive ml-2" role="alert">
                   {front.length === 0 ? "Front is required" : `Front must be ${FRONT_MAX} characters or less`}
                 </p>
@@ -120,11 +124,12 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
                 "w-full rounded-md border bg-background px-3 py-2 text-sm",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 "resize-y",
-                !backValid &&
+                attemptedSubmit &&
+                  !backValid &&
                   "border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
               )}
-              aria-invalid={!backValid}
-              aria-describedby="manual-back-error"
+              aria-invalid={attemptedSubmit && !backValid}
+              aria-describedby={attemptedSubmit && !backValid ? "manual-back-error" : undefined}
             />
             <div className="flex items-center justify-between">
               <CharacterCounter
@@ -133,7 +138,7 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
                 label="Back text character count"
                 showError={back.length > BACK_MAX}
               />
-              {(back.length === 0 || back.length > BACK_MAX) && (
+              {attemptedSubmit && (back.length === 0 || back.length > BACK_MAX) && (
                 <p id="manual-back-error" className="text-xs text-destructive ml-2" role="alert">
                   {back.length === 0 ? "Back is required" : `Back must be ${BACK_MAX} characters or less`}
                 </p>
@@ -141,7 +146,7 @@ export function ManualCardForm({ onCreate, saving = false, collapsed: initialCol
             </div>
           </div>
 
-          <Button type="submit" disabled={!isValid || saving} className="w-full">
+          <Button type="submit" disabled={saving} className="w-full">
             {saving ? "Saving..." : "Save Card"}
           </Button>
         </form>

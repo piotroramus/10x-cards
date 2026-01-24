@@ -36,8 +36,8 @@ export function TextInputArea({
     // Additional sanitization can be added here if needed
   };
 
-  const hasError = error || value.length > maxLength;
-  const showError = value.length > maxLength;
+  const hasError = !!error;
+  const showError = !!error;
 
   return (
     <div className="space-y-2">
@@ -77,11 +77,6 @@ export function TextInputArea({
       {error && (
         <p id="text-input-error" className="text-sm text-destructive" role="alert">
           {error}
-        </p>
-      )}
-      {showError && !error && (
-        <p className="text-sm text-destructive" role="alert">
-          Input must be {maxLength.toLocaleString()} characters or less
         </p>
       )}
     </div>

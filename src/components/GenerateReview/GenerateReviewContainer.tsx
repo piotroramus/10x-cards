@@ -24,6 +24,7 @@ export function GenerateReviewContainer() {
 
   // Text input state
   const [textInput, setTextInput] = useState("");
+  const [textInputError, setTextInputError] = useState<string | undefined>(undefined);
 
   // Generation state
   const [generationState, setGenerationState] = useState<GenerationState>({
@@ -42,22 +43,32 @@ export function GenerateReviewContainer() {
   const handleTextInputChange = useCallback(
     (value: string) => {
       setTextInput(value);
-      // Clear error when user starts typing
+      // Clear errors when user starts typing
+      if (textInputError) {
+        setTextInputError(undefined);
+      }
       if (generationState.error) {
         setGenerationState((prev) => ({ ...prev, error: null }));
       }
     },
-    [generationState.error]
+    [textInputError, generationState.error]
   );
 
   // Handle generate proposals
   const handleGenerate = useCallback(async () => {
-    if (!isAuthenticated) {
-      toast.error("Please sign in to generate proposals");
+    // Validate input
+    if (textInput.length === 0) {
+      setTextInputError("Please enter some text to generate flashcard proposals");
       return;
     }
 
-    if (textInput.length === 0 || textInput.length > 10000) {
+    if (textInput.length > 10000) {
+      setTextInputError("Input must be 10,000 characters or less");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error("Please sign in to generate proposals");
       return;
     }
 
@@ -66,6 +77,9 @@ export function GenerateReviewContainer() {
       toast.error("Authentication required. Please sign in.");
       return;
     }
+
+    // Clear any previous input errors
+    setTextInputError(undefined);
 
     setGenerationState((prev) => ({
       ...prev,
@@ -220,15 +234,8 @@ export function GenerateReviewContainer() {
   );
 
   // Validation for generate button
-  const canGenerate =
-    textInput.length > 0 && textInput.length <= 10000 && isAuthenticated && !generationState.isLoading;
-  const generateDisabledMessage = !isAuthenticated
-    ? "Please sign in to generate"
-    : textInput.length > 10000
-      ? "Input must be 10,000 characters or less"
-      : textInput.length === 0
-        ? "Enter text to generate proposals"
-        : undefined;
+  const canGenerate = !generationState.isLoading;
+  const generateDisabledMessage = generationState.isLoading ? "Generating proposals..." : undefined;
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -246,6 +253,7 @@ export function GenerateReviewContainer() {
             value={textInput}
             onChange={handleTextInputChange}
             disabled={generationState.isLoading}
+            error={textInputError}
             maxLength={10000}
           />
 
